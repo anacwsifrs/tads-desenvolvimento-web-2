@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro</title>
+</head>
+<body>
+    <form action="processar.php" method="post">
+        <fieldset>
+            <legend>Cadastro de Usuário</legend>
+
+            <label>
+                Nome: <input type="text" name="nome" />
+            </label>
+            <br><br>
+
+            <label>
+                E-mail: <input type="text" name="email" />
+            </label>
+            <br><br>
+
+            Sexo: <br>
+            <input type="radio" name="sexo" value="Masculino" /> Masculino
+            <input type="radio" name="sexo" value="Feminino" /> Feminino
+            <br><br>
+
+            <label>
+                Data de Nascimento (dd/mm/yyyy): <input type="text" name="data_nascimento" />
+            </label>
+            <br><br>
+
+            <label>
+                Endereço: <input type="text" name="endereco" />
+            </label>
+            <br><br>
+
+            <label>
+                Bairro: <input type="text" name="bairro" />
+            </label>
+            <br><br>
+
+            <label>
+                Estado: 
+                <select name="estado">
+                    <option value="RS">RS</option>
+                    <option value="SC">SC</option>
+                    <option value="PR">PR</option>
+                    <option value="SP">SP</option>
+                    <option value="RJ">RJ</option>
+                </select>
+            </label>
+            <br><br>
+
+            <label>
+                Cidade: <input type="text" name="cidade" />
+            </label>
+            <br><br>
+
+            <label>
+                CEP: <input type="text" name="cep" />
+            </label>
+            <br><br>
+
+            <label>
+                <input type="checkbox" name="receber_emails" value="Sim" /> Deseja receber e-mails?
+            </label>
+            <br><br>
+
+            <input type="submit" value="Enviar" />
+        </fieldset>
+    </form>
+</body>
+</html>
