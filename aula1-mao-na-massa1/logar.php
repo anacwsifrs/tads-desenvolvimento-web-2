@@ -4,9 +4,10 @@
     echo 'Sexo: ' . $_POST['sex'] . '<br><br>';
 
     echo 'Esportes ' . '<br>';
-        for($i = 1; $i<3; $i++){
-            echo '<li>' . $_POST['esporte[$i]'] . '</li';
-        }
+    for($i = 0; $i < 2; $i++){
+        echo '<li>' . $_POST['esporte'][$i] . '</li>';
+    }
         
     echo 'Sorvete preferido: '. $_POST['sabor'] . '<br><br>';
     echo '<b> Sobre você </b>: ' . $_POST['mensagem'] . '<br><br>';
+?>
