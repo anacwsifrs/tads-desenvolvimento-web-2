@@ -1,11 +1,14 @@
 <?php
 if (isset($_REQUEST["arquivo"])) {
-    $arquivo = "uploads/" . $_REQUEST["arquivo"];
-    if (file_exists($arquivo)) {
-        unlink($arquivo);
-        echo "Arquivo deletado com sucesso!";
-    } else {
-        echo "Erro: Arquivo não encontrado.";
+    $nomeArquivo = basename($_REQUEST["arquivo"]);
+    $caminhoArquivo = "uploads/" . $nomeArquivo;
+
+    if (file_exists($caminhoArquivo)) {
+        unlink($caminhoArquivo);
     }
 }
+
+// Redireciona de volta para a listagem imediatamente
+header("Location: listar.php");
+exit;
 ?>

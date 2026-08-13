@@ -6,12 +6,14 @@ if (!is_dir($diretorioDestino)) {
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["arquivo"])) {
     $arquivo = $_FILES["arquivo"];
-    $nomeArquivo = basename($arquivo["name"]);
-    $caminhoFinal = $diretorioDestino . $nomeArquivo;
     
-    $extensao = strtolower(pathinfo($caminhoFinal, PATHINFO_EXTENSION));
+    $extensao = strtolower(pathinfo($arquivo["name"], PATHINFO_EXTENSION));
 
-    $tamanhoMaximo = 2 * 1024 * 1024; // 2MB
+    $hashConteudo = md5_file($arquivo["tmp_name"]);
+    $nomeNovo = $hashConteudo . "." . $extensao;
+    $caminhoFinal = $diretorioDestino . $nomeNovo;
+
+    $tamanhoMaximo = 2 * 1024 * 1024; 
     $extensoesPermitidas = ["jpg", "png", "pdf", "txt"];
 
     if ($arquivo["size"] > $tamanhoMaximo) {
@@ -22,10 +24,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["arquivo"])) {
         die("Erro: Tipo de arquivo não permitido.");
     }
 
-    if (move_uploaded_file($arquivo["tmp_name"], $caminhoFinal)) {
-        echo "Arquivo enviado com sucesso: <a href='$caminhoFinal'>$nomeArquivo</a>";
+    if (file_exists($caminhoFinal)) {
+        echo "Este arquivo já foi enviado anteriormente e já existe na pasta!<br><br>";
+        echo "<a href='listar.php'>Ver Lista de Arquivos</a> | <a href='form.html'>Voltar</a>";
     } else {
-        echo "Erro ao enviar o arquivo.";
+        if (move_uploaded_file($arquivo["tmp_name"], $caminhoFinal)) {
+            echo "Arquivo enviado com sucesso!<br><br>";
+            echo "<a href='listar.php'>Ver Lista de Arquivos</a> | <a href='form.html'>Enviar Outro Arquivo</a>";
+        } else {
+            echo "Erro ao enviar o arquivo.";
+        }
     }
 } else {
     echo "Nenhum arquivo enviado.";
