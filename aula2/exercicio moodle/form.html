@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de Arquivos</title>
+</head>
+<body>
+    <h2>Envie um Arquivo</h2>
+    <form action="upload.php" method="POST" enctype="multipart/form-data">
+        <input type="file" name="arquivo" required>
+        <button type="submit">Enviar</button>
+    </form>
+    
+    <br>
+    <a href="listar.php">Ver arquivos enviados</a> 
+    <br>
+    <a href='logs.php'>Ver Logs</a>
+</body>
+</html>

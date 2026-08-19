@@ -8,7 +8,6 @@ if (isset($_REQUEST["arquivo"])) {
     }
 }
 
-// Redireciona de volta para a listagem imediatamente
 header("Location: listar.php");
 exit;
 ?>
