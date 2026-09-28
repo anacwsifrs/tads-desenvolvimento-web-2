@@ -8,12 +8,12 @@ class Lote {
         $this->conn = Conexao::getConexao();
     }
 
-    public function criar($token, $status, $categorias_ids) {
+    public function criar($codigo, $chave_pix, $tipo_recebimento, $valor_proposta, $valor_credito, $status, $comprovante_pix, $categorias_ids) {
         try {
             $this->conn->beginTransaction();
 
-            $stmt = $this->conn->prepare("INSERT INTO lotes (token, status) VALUES (?, ?)");
-            $stmt->execute([$token, $status]);
+            $stmt = $this->conn->prepare("INSERT INTO lotes (codigo, chave_pix, tipo_recebimento, valor_proposta, valor_credito, status, comprovante_pix) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$codigo, $chave_pix, $tipo_recebimento, $valor_proposta, $valor_credito, $status, $comprovante_pix]);
             $lote_id = $this->conn->lastInsertId();
 
             if (!empty($categorias_ids)) {
@@ -42,23 +42,30 @@ class Lote {
     }
 
     public function buscarPorId($id) {
-        $stmt = $this->conn->prepare("SELECT * FROM lotes WHERE id = ?");
+        $stmt = $this->conn->prepare("SELECT l.*, GROUP_CONCAT(c.nome SEPARATOR ', ') as categorias_nomes 
+                                      FROM lotes l 
+                                      LEFT JOIN lote_categoria lc ON l.id = lc.lote_id 
+                                      LEFT JOIN categorias c ON lc.categoria_id = c.id 
+                                      WHERE l.id = ?
+                                      GROUP BY l.id");
         $stmt->execute([$id]);
         $lote = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $stmtCat = $this->conn->prepare("SELECT categoria_id FROM lote_categoria WHERE lote_id = ?");
-        $stmtCat->execute([$id]);
-        $lote['categorias'] = $stmtCat->fetchAll(PDO::FETCH_COLUMN);
+        if ($lote) {
+            $stmtCat = $this->conn->prepare("SELECT categoria_id FROM lote_categoria WHERE lote_id = ?");
+            $stmtCat->execute([$id]);
+            $lote['categorias'] = $stmtCat->fetchAll(PDO::FETCH_COLUMN);
+        }
 
         return $lote;
     }
 
-    public function atualizar($id, $token, $status, $categorias_ids) {
+    public function atualizar($id, $codigo, $chave_pix, $tipo_recebimento, $valor_proposta, $valor_credito, $status, $comprovante_pix, $categorias_ids) {
         try {
             $this->conn->beginTransaction();
 
-            $stmt = $this->conn->prepare("UPDATE lotes SET token = ?, status = ? WHERE id = ?");
-            $stmt->execute([$token, $status, $id]);
+            $stmt = $this->conn->prepare("UPDATE lotes SET codigo = ?, chave_pix = ?, tipo_recebimento = ?, valor_proposta = ?, valor_credito = ?, status = ?, comprovante_pix = ? WHERE id = ?");
+            $stmt->execute([$codigo, $chave_pix, $tipo_recebimento, $valor_proposta, $valor_credito, $status, $comprovante_pix, $id]);
 
             $stmtDel = $this->conn->prepare("DELETE FROM lote_categoria WHERE lote_id = ?");
             $stmtDel->execute([$id]);

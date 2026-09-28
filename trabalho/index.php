@@ -22,6 +22,12 @@ switch ($acao) {
     case 'deletar':
         $controller->deletar($_GET['id']);
         break;
+    case 'api_listar':
+        $controller->apiListar();
+        break;
+    case 'api_detalhar':
+        $controller->apiDetalhar($_GET['id']);
+        break;
     default:
         $controller->index();
         break;
