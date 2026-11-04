@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO usuarios (cpf, nome, email, senha, telefone, chave_pix, foto, tipo) VALUES (?, ?, ?, ?, ?, ?, ?, 'cliente')");
             $stmt->execute([$cpf, $nome, $email, $senhaHash, $telefone, $pix, $nomeFoto]);
             
-            echo "<script>alert('Cadastro realizado com sucesso! Faça seu login.'); window.location.href='login.php';</script>";
+            echo "<script>alert('Cadastro realizado com sucesso! Faça seu login.'); window.location.href='index.php?acao=login';</script>";
             exit;
         } catch (PDOException $e) {
             $mensagem = "Erro: CPF ou E-mail já cadastrados no sistema.";
@@ -44,7 +44,7 @@ require_once 'header.php';
     <p style="color:red; font-weight:bold;"><?= $mensagem ?></p>
 <?php endif; ?>
 
-<form action="cadastro.php" method="POST" enctype="multipart/form-data" style="margin-top:15px;">
+<form action="index.php?acao=cadastro" method="POST" enctype="multipart/form-data" style="margin-top:15px;">
     <div style="margin-bottom:10px;">
         <label>CPF (obrigatório):</label><br>
         <input type="text" name="cpf" required placeholder="000.000.000-00" style="width:100%; padding:8px;">

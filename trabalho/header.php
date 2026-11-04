@@ -1,5 +1,5 @@
 <?php
-require_once 'conexao.php';
+require_once __DIR__ . '/conexao.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -24,20 +24,20 @@ require_once 'conexao.php';
     <header>
         <h1><a href="index.php" style="color:white; text-decoration:none;">🛍️ Brechó EcoModa</a></h1>
         <nav>
-            <a href="index.php">Início</a>
-            <a href="vitrine.php">Vitrine Pública</a>
-            <a href="fale_conosco.php">Fale Conosco</a>
-            <a href="termos.php">Termos e LGPD</a>
+            <a href="index.php?acao=vitrine">Início</a>
+            <a href="index.php?acao=vitrine">Vitrine Pública</a>
+            <a href="index.php?acao=fale_conosco">Fale Conosco</a>
+            <a href="index.php?acao=termos">Termos e LGPD</a>
             
             <?php if (isset($_SESSION['usuario_id'])): ?>
                 <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
-                    <a href="admin_lotes.php" style="color:#ffc107;">Painel Admin</a>
+                    <a href="index.php?acao=listar" style="color:#ffc107;">Painel Admin</a>
                 <?php else: ?>
-                    <a href="meus_lotes.php" style="color:#20c997;">Meus Lotes</a>
+                    <a href="index.php?acao=meus_lotes" style="color:#20c997;">Meus Lotes</a>
                 <?php endif; ?>
-                <a href="logout.php" style="color:#f44336;">Sair</a>
+                <a href="index.php?acao=logout" style="color:#f44336;">Sair</a>
             <?php else: ?>
-                <a href="login.php" style="color:#28a745;">Login / Cadastro</a>
+                <a href="index.php?acao=login" style="color:#28a745;">Login / Cadastro</a>
             <?php endif; ?>
         </nav>
         

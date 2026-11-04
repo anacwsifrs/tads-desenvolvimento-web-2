@@ -21,7 +21,7 @@ if (!$peca) {
 $preco_venda = $peca['valor_proposto'] * 1.4;
 ?>
 
-<a href="vitrine.php" style="text-decoration:none; color:#007bff;">← Voltar para a Vitrine</a>
+<a href="index.php?acao=vitrine" style="text-decoration:none; color:#007bff;">← Voltar para a Vitrine</a>
 
 <div style="display:flex; gap:30px; margin-top:20px; align-items:flex-start;">
     <div style="width:300px; height:300px; background:#e9ecef; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:48px;">

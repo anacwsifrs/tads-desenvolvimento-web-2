@@ -1,56 +1,86 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-$host = 'localhost';
-$db = 'brecho_db';
-$user = 'root';
-$pass = '';
-$conexao = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
-
+require_once 'conexao.php';
 require_once 'models/LoteModel.php';
-$loteModel = new LoteModel($conexao);
-$loteModel->atualizarLotesExpirados();
-$acao = isset($_GET['acao']) ? $_GET['acao'] : 'listar';
 
-if ($acao == 'listar') {
+$loteModel = new LoteModel($pdo);
+$loteModel->atualizarLotesExpirados();
+
+$acao = isset($_GET['acao']) ? $_GET['acao'] : 'listar';
+$rotasPublicas = [
+    'login', 
+    'cadastro', 
+    'recuperar_senha', 
+    'vitrine', 
+    'detalhar', 
+    'fale_conosco', 
+    'termos', 
+    'proposta', 
+    'responder_proposta',
+    'buscar_cliente'
+];
+
+if (!in_array($acao, $rotasPublicas) && !isset($_SESSION['usuario_id'])) {
+    header("Location: index.php?acao=login");
+    exit;
+}
+
+$rotasAdmin = [
+    'listar', 
+    'cadastrar',
+    'salvar',
+    'avaliar', 
+    'salvar_proposta', 
+    'editar', 
+    'salvar_edicao', 
+    'excluir', 
+    'upload_comprovante', 
+    'clientes', 
+    'debitar_saldo'
+];
+
+if (in_array($acao, $rotasAdmin) && isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] !== 'admin') {
+    header("Location: index.php?acao=meus_lotes");
+    exit;
+}
+
+if ($acao == 'login') {
+    require_once 'views/login.php';
+
+} elseif ($acao == 'cadastro') {
+    require_once 'views/cadastro.php';
+
+} elseif ($acao == 'logout') {
+    require_once 'views/logout.php';
+
+} elseif ($acao == 'recuperar_senha') {
+    require_once 'views/recuperar_senha.php';
+
+} elseif ($acao == 'vitrine') {
+    require_once 'views/vitrine.php';
+
+} elseif ($acao == 'detalhar') {
+    require_once 'views/detalhar.php';
+
+} elseif ($acao == 'fale_conosco') {
+    require_once 'views/fale_conosco.php';
+
+} elseif ($acao == 'termos') {
+    require_once 'views/termos.php';
+
+} elseif ($acao == 'listar') {
     $lotes = $loteModel->listarLotes();
     require_once 'views/listar.php';
 
-} elseif ($acao == 'clientes') {
-    $clientes = $loteModel->listarClientes();
-    require_once 'views/clientes.php';
-
-} elseif ($acao == 'debitar_saldo') {
-    $cliente_id = $_POST['cliente_id'];
-    $valor_gasto = $_POST['valor_gasto'];
-    $justificativa = $_POST['justificativa'];
-
-    if ($loteModel->debitarSaldoCliente($cliente_id, $valor_gasto)) {
-        echo "<script>alert('Saldo debitado com sucesso! Motivo: $justificativa'); window.location.href='index.php?acao=clientes';</script>";
-    } else {
-        echo "<script>alert('Erro ao debitar saldo.'); window.history.back();</script>";
-    }
-
-} elseif ($acao == 'upload_comprovante') {
-    $lote_id = $_POST['lote_id'];
-
-    if (isset($_FILES['comprovante']) && $_FILES['comprovante']['error'] == 0) {
-        $extensao = pathinfo($_FILES['comprovante']['name'], PATHINFO_EXTENSION);
-        $novo_nome = "comprovante_" . $lote_id . "_" . time() . "." . $extensao;
-        
-        $diretorio = "uploads/";
-        if (!is_dir($diretorio)) {
-            mkdir($diretorio, 0777, true);
-        }
-
-        if (move_uploaded_file($_FILES['comprovante']['tmp_name'], $diretorio . $novo_nome)) {
-            $loteModel->salvarComprovante($lote_id, $novo_nome);
-            echo "<script>alert('Comprovante anexado com sucesso!'); window.location.href='index.php';</script>";
-        } else {
-            echo "<script>alert('Erro ao salvar arquivo.'); window.history.back();</script>";
-        }
-    } else {
-        echo "<script>alert('Nenhum arquivo enviado.'); window.history.back();</script>";
-    }
+} elseif ($acao == 'meus_lotes') {
+    $cliente_id = $_SESSION['usuario_id'];
+    $stmt = $pdo->prepare("SELECT * FROM lotes WHERE cliente_id = ? ORDER BY id DESC");
+    $stmt->execute([$cliente_id]);
+    $meusLotes = $stmt->fetchAll();
+    require_once 'views/meus_lotes.php';
 
 } elseif ($acao == 'cadastrar') {
     $categorias = $loteModel->listarCategorias();
@@ -83,20 +113,18 @@ if ($acao == 'listar') {
         }
     }
 
-    $sucesso = $loteModel->cadastrarLoteCompleto($cpf, $nome, $telefone, $pix, $descricao_lote, $pecas);
-
-    if ($sucesso) {
-        echo "<script>alert('Lote e peças cadastrados com sucesso!'); window.location.href='index.php';</script>";
+    if ($loteModel->cadastrarLoteCompleto($cpf, $nome, $telefone, $pix, $descricao_lote, $pecas)) {
+        echo "<script>alert('Lote e peças cadastrados com sucesso!'); window.location.href='index.php?acao=listar';</script>";
     } else {
-        echo "<script>alert('Erro ao cadastrar.'); window.history.back();</script>";
+        echo "<script>alert('Erro ao cadastrar lote.'); window.history.back();</script>";
     }
 
 } elseif ($acao == 'avaliar') {
-    $id = $_GET['id'];
+    $id = $_GET['id'] ?? 0;
     $lote = $loteModel->buscarLotePorId($id);
 
-    if ($lote['status'] >= 3) {
-        echo "<script>alert('Este lote já foi avaliado e não pode ser reavaliado.'); window.location.href='index.php';</script>";
+    if ($lote && $lote['status'] >= 3) {
+        echo "<script>alert('Este lote já foi avaliado e não pode ser reavaliado.'); window.location.href='index.php?acao=listar';</script>";
         exit;
     }
 
@@ -108,7 +136,7 @@ if ($acao == 'listar') {
     $pecas_avaliadas = isset($_POST['pecas']) ? $_POST['pecas'] : [];
     
     if ($loteModel->salvarProposta($lote_id, $valor_total, $pecas_avaliadas)) {
-        echo "<script>alert('Proposta salva! O lote agora aguarda a resposta do cliente.'); window.location.href='index.php';</script>";
+        echo "<script>alert('Proposta salva! O lote agora aguarda a resposta do cliente.'); window.location.href='index.php?acao=listar';</script>";
     } else {
         echo "<script>alert('Erro ao salvar proposta.'); window.history.back();</script>";
     }
@@ -138,7 +166,7 @@ if ($acao == 'listar') {
     }
 
 } elseif ($acao == 'editar') {
-    $id = $_GET['id'];
+    $id = $_GET['id'] ?? 0;
     $lote = $loteModel->buscarLotePorId($id);
     require_once 'views/editar.php';
 
@@ -151,17 +179,58 @@ if ($acao == 'listar') {
     $descricao = $_POST['descricao_lote'];
 
     if ($loteModel->atualizarLote($lote_id, $descricao, $cpf, $nome, $telefone, $pix)) {
-        echo "<script>alert('Lote atualizado com sucesso!'); window.location.href='index.php';</script>";
+        echo "<script>alert('Lote atualizado com sucesso!'); window.location.href='index.php?acao=listar';</script>";
     } else {
-        echo "<script>alert('Erro ao atualizar.'); window.history.back();</script>";
+        echo "<script>alert('Erro ao atualizar lote.'); window.history.back();</script>";
     }
 
 } elseif ($acao == 'excluir') {
-    $id = $_GET['id'];
+    $id = $_GET['id'] ?? 0;
     if ($loteModel->excluirLote($id)) {
-        echo "<script>alert('Lote excluído com sucesso!'); window.location.href='index.php';</script>";
+        echo "<script>alert('Lote excluído com sucesso!'); window.location.href='index.php?acao=listar';</script>";
     } else {
-        echo "<script>alert('Erro ao excluir lote.'); window.history.back();</script>";
+        echo "<script>alert('Erro ao excluir lote.'); window.location.href='index.php?acao=listar';</script>";
     }
+
+} elseif ($acao == 'upload_comprovante') {
+    $lote_id = $_POST['lote_id'];
+
+    if (isset($_FILES['comprovante']) && $_FILES['comprovante']['error'] == 0) {
+        $extensao = pathinfo($_FILES['comprovante']['name'], PATHINFO_EXTENSION);
+        $novo_nome = "comprovante_" . $lote_id . "_" . time() . "." . $extensao;
+        
+        $diretorio = "uploads/";
+        if (!is_dir($diretorio)) {
+            mkdir($diretorio, 0777, true);
+        }
+
+        if (move_uploaded_file($_FILES['comprovante']['tmp_name'], $diretorio . $novo_nome)) {
+            $loteModel->salvarComprovante($lote_id, $novo_nome);
+            echo "<script>alert('Comprovante anexado com sucesso!'); window.location.href='index.php?acao=listar';</script>";
+        } else {
+            echo "<script>alert('Erro ao salvar o arquivo do comprovante.'); window.history.back();</script>";
+        }
+    } else {
+        echo "<script>alert('Nenhum arquivo enviado.'); window.history.back();</script>";
+    }
+
+} elseif ($acao == 'clientes') { 
+    $clientes = $loteModel->listarClientes();
+    require_once 'views/clientes.php';
+
+} elseif ($acao == 'debitar_saldo') {
+    $cliente_id = $_POST['cliente_id'];
+    $valor_gasto = $_POST['valor_gasto'];
+    $justificativa = $_POST['justificativa'];
+
+    if ($loteModel->debitarSaldoCliente($cliente_id, $valor_gasto)) {
+        echo "<script>alert('Saldo debitado com sucesso! Motivo: $justificativa'); window.location.href='index.php?acao=clientes';</script>";
+    } else {
+        echo "<script>alert('Erro ao debitar saldo.'); window.history.back();</script>";
+    }
+
+} else {
+    header("Location: index.php?acao=vitrine");
+    exit;
 }
 ?>

@@ -1,6 +1,27 @@
 <?php
 header('Content-Type: application/json');
 
+function carregarEnv($caminho) {
+    if (!file_exists($caminho)) {
+        return false;
+    }
+    $linhas = file($caminho, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($linhas as $linha) {
+        if (strpos(trim($linha), '#') === 0) continue; 
+        list($nome, $valor) = explode('=', $linha, 2);
+        $_ENV[trim($nome)] = trim($valor);
+    }
+    return true;
+}
+
+carregarEnv(__DIR__ . '/../.env');
+$apiKey = $_ENV['GEMINI_API_KEY'] ?? getenv('GEMINI_API_KEY');
+
+if (!$apiKey) {
+    echo json_encode(['erro' => 'Chave de API do Gemini não configurada no ficheiro .env.']);
+    exit;
+}
+
 $data = json_decode(file_get_contents('php://input'), true);
 $descricaoPeca = isset($data['descricao']) ? $data['descricao'] : '';
 
@@ -9,7 +30,6 @@ if (empty($descricaoPeca)) {
     exit;
 }
 
-$apiKey = 'SUA_CHAVE_API_GEMINI_AQUI';
 $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" . $apiKey;
 
 $prompt = "Você é um avaliador especialista em brechós de moda. Analise a seguinte peça: '$descricaoPeca'. Sugira um valor em Reais (R$) para compra no brechó e faça um comentário curto sobre o apelo comercial dela. Responda em texto simples e conciso.";

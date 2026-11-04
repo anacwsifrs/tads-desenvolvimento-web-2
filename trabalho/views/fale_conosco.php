@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <h2>Fale Conosco</h2>
 <?= $mensagem_status ?>
 
-<form action="fale_conosco.php" method="POST" style="margin-top:15px; max-width:600px;">
+<form action="index.php?acao=fale_conosco" method="POST" style="margin-top:15px; max-width:600px;">
     <div style="margin-bottom:10px;">
         <label>Seu Nome:</label><br>
         <input type="text" name="nome" required style="width:100%; padding:8px;">

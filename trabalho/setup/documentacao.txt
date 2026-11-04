@@ -16,3 +16,6 @@ Decisão do Cliente: Na tela exclusiva do link, o cliente pode tomar uma das seg
 Gestão de Prazos e Consequências: O sistema trabalha com regras de tempo de 3 dias úteis:
     Se o cliente não responder à proposta em 3 dias úteis, o lote é considerado abandonado e as peças são destinadas para doação.
     Se o cliente recusar a proposta, ele tem 3 dias úteis para retirar as peças na loja. Caso não compareça, as peças também são destinadas para doação.
+
+admin@brecho.com
+admin123

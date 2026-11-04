@@ -23,7 +23,7 @@ $pecas = $stmt->fetchAll();
                 <span style="background:#e9ecef; padding:3px 8px; font-size:12px; border-radius:3px; font-weight:bold;"><?= htmlspecialchars($p['categoria_nome']) ?></span>
                 <h3 style="margin: 10px 0 5px 0; font-size:18px;"><?= htmlspecialchars($p['descricao'] ?: 'Peça de Vestuário') ?></h3>
                 <p style="font-size: 20px; color: #28a745; font-weight: bold;">R$ <?= number_format($p['valor_proposto'] * 1.4, 2, ',', '.') ?></p> <!-- Margem de venda da loja -->
-                <a href="detalhar.php?id=<?= $p['id'] ?>" style="display:inline-block; margin-top:10px; padding:8px 12px; background:#007bff; color:white; text-decoration:none; border-radius:4px; font-size:14px;">Ver Detalhes</a>
+                <a href="index.php?acao=detalhar&id=<?= $p['id'] ?>" style="display:inline-block; margin-top:10px; padding:8px 12px; background:#007bff; color:white; text-decoration:none; border-radius:4px; font-size:14px;">Ver Detalhes</a>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>

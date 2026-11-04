@@ -23,7 +23,7 @@ require_once 'header.php';
     <p style="color:blue; font-weight:bold; margin-bottom:10px;"><?= $msg ?></p>
 <?php endif; ?>
 
-<form action="recuperar_senha.php" method="POST" style="max-width:400px;">
+<form action="index.php?acao=recuperar_senha" method="POST" style="max-width:400px;">
     <div style="margin-bottom:10px;">
         <label>Informe seu e-mail cadastrado:</label><br>
         <input type="email" name="email" required style="width:100%; padding:8px;">

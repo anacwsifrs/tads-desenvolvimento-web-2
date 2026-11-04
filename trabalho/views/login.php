@@ -32,7 +32,7 @@ require_once 'header.php';
     <p style="color:red;"><?= $erro ?></p>
 <?php endif; ?>
 
-<form action="login.php" method="POST" style="max-width:400px; margin-top:15px;">
+<form action="index.php?acao=login" method="POST" style="max-width:400px; margin-top:15px;">
     <div style="margin-bottom:10px;">
         <label>E-mail:</label><br>
         <input type="email" name="email" required style="width:100%; padding:8px;">
@@ -44,7 +44,7 @@ require_once 'header.php';
     <button type="submit" style="padding:10px 20px; background:#007bff; color:white; border:none; cursor:pointer;">Entrar</button>
 </form>
 <p style="margin-top:15px;">
-    Não tem conta? <a href="cadastro.php">Cadastre-se aqui</a> | <a href="recuperar_senha.php">Esqueceu a senha?</a>
+    Não tem conta? <a href="index.php?acao=cadastro">Cadastre-se aqui</a> | <a href="index.php?acao=recuperar_senha">Esqueceu a senha?</a>
 </p>
 
 <?php require_once 'footer.php'; ?>
