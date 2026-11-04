@@ -1,0 +1,15 @@
+* melhorar css
+* verificar se o código usa react e se usa as tecnologias em aula, os códigos do sor, etc
+* melhorar as categorias pré-cadastradas em lote
+
+Atualizar o banco.sql para 6~7 tabelas (adicionando usuarios, mensagens_contato, historico_saldo, etc.).
+
+Refatorar a estrutura visual: Criar conexao.php, header.php (com a tag <meta name="plagiarism">) e footer.php.
+
+Criar o módulo de Usuários: Login, Recuperação de Senha e Cadastro com Foto (upload).
+
+Criar as telas faltantes: Fale Conosco (envio de e-mail), Termos LGPD e Detalhe do Produto (detalhar.php?id=X).
+
+Integração com Gemini API: Adicionar a requisição para sugestão de preço/descrição por IA na tela de avaliação.
+
+* hospedar
