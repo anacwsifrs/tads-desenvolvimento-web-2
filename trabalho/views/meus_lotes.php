@@ -1,6 +1,4 @@
-<?php
-require_once 'header.php';
-?>
+<?php require_once 'header.php';?>
 
 <h2>Meus Lotes Cadastrados</h2>
 <p style="margin-bottom:20px;">Acompanhe o status e as propostas dos seus lotes de roupas enviado ao brechó.</p>

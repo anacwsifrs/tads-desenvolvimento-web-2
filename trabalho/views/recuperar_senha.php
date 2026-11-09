@@ -1,5 +1,4 @@
 <?php
-require_once 'conexao.php';
 $msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

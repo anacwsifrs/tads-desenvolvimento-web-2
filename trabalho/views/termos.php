@@ -1,6 +1,4 @@
-<?php
-require_once 'header.php';
-?>
+<?php require_once 'header.php'; ?>
 
 <h2>Termos de Serviço, Política de Privacidade (LGPD) e Declaração Anti-Plágio</h2>
 
