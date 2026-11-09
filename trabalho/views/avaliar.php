@@ -42,7 +42,14 @@
                 <?php foreach ($lote['pecas'] as $peca): ?>
                     <tr>
                         <td><?= htmlspecialchars($peca['categoria_nome']) ?></td>
-                        <td><?= htmlspecialchars($peca['descricao']) ?></td>
+                        <td>
+                            <span id="desc-peca-<?= $peca['id'] ?>"><?= htmlspecialchars($peca['descricao']) ?></span>
+                            <br><br>
+                            <button type="button" onclick="pedirSugestaoIA(<?= $peca['id'] ?>)" class="btn-acao" style="background-color: #6f42c1; color: white; opacity: 1; padding: 5px 10px; font-size: 12px; width: 100%;">
+                                ✨ Sugestão de Preço IA
+                            </button>
+                            <div id="resposta-ia-<?= $peca['id'] ?>" style="margin-top: 10px; font-style: italic; color: #555; font-size: 13px;"></div>
+                        </td>
                         <td>
                             <input type="hidden" name="pecas[<?= $peca['id'] ?>][status]" id="status_<?= $peca['id'] ?>" class="status-input" value="0">
                             
@@ -118,6 +125,36 @@
             return false;
         }
         return true;
+    }
+
+    function pedirSugestaoIA(idPeca) {
+        const descricao = document.getElementById('desc-peca-' + idPeca).innerText;
+        const divResposta = document.getElementById('resposta-ia-' + idPeca);
+        
+        divResposta.innerText = "⏳ A IA está analisando a peça...";
+
+        fetch('views/api_gemini.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ descricao: descricao })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.erro) {
+                divResposta.innerHTML = "<span style='color:red;'>Erro: " + data.erro + "</span>";
+                return;
+            }
+            
+            if (data.candidates && data.candidates.length > 0) {
+                const textoIA = data.candidates[0].content.parts[0].text;
+                divResposta.innerHTML = "<strong>Sugestão:</strong> " + textoIA;
+            } else {
+                divResposta.innerText = "A IA não conseguiu gerar uma sugestão.";
+            }
+        })
+        .catch(error => {
+            divResposta.innerHTML = "<span style='color:red;'>Erro de comunicação com a API.</span>";
+        });
     }
 </script>
 

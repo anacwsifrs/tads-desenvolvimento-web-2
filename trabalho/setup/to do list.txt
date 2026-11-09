@@ -1,5 +1,6 @@
 Frescura:
 * melhorar as categorias pré-cadastradas em lote
+* tirar o botão de sugerir preço da descrição e por em valor ofertado, mas fazer isso depois de rever a entidade peças
 
 Pede na especificação:
 * melhorar css + usar react em alguma coisa
@@ -10,9 +11,6 @@ Pede na especificação:
 * Implementar duas telas de listagens públicas (vitrine brechó que lista todas as peças cadastradas + falta outra)
 * Hospedar Locaweb 
 
-Testar:
-* Testar se funciona Integração com Gemini API: Adicionar a requisição para sugestão de preço/descrição por IA na tela de avaliação. Ou pra pessoa ver a vitrine.
-
 ----------------------------------------------------------------------
 
 Feito:
@@ -22,6 +20,7 @@ Feito:
 * Tenho um arquivo PHP separado só para conexão com o banco e dou include dele em todas as outras páginas que acessam BD.
 * Tenho AJAX em views/cadastrar.php: quando você digita o CPF, se o cliente já existe, o nome, e-mail, telefone e chave PIX do cliente são preenchidos automaticamente na tela sem dar refresh.
 * Tenho SPA na tela de perfil
+* Integração com Gemini API
 
 ----------------------------------------------------------------------
 
