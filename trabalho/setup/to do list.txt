@@ -15,9 +15,6 @@ Testar:
 * Testar se funciona Integração com Gemini API: Adicionar a requisição para sugestão de preço/descrição por IA na tela de avaliação. Ou pra pessoa ver a vitrine.
 * Validar se temos AJAX e SPA pelo menos em um recurso
 
-Bugs:
-* fui criar um lote + cliente novo para testar e deu erro, mas não consegui pegar no console nem na aba network o que falhou. quero aproveitar esse momento para garantir que o cadastro tenha validação de campos (HTML e/ou JS) e no backend também. funciona quando o cliente cria a própria conta 
-
 ----------------------------------------------------------------------
 
 Feito:
@@ -38,3 +35,5 @@ Na hora de enviar o trabalho:
 Credenciais admin
 2025000434@aluno.canoas.ifrs.edu.br
 admin123
+
+a senha padrão gerada é sempre a palavra brecho seguida dos 4 primeiros números do CPF

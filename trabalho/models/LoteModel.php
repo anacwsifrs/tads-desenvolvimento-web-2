@@ -7,47 +7,62 @@ class LoteModel {
     }
 
     public function buscarClientePorCpf($cpf) {
-        $stmt = $this->conn->prepare("SELECT * FROM clientes WHERE cpf = ?");
+        $stmt = $this->conn->prepare("SELECT * FROM usuarios WHERE cpf = ?");
         $stmt->execute([$cpf]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function listarClientes() {
-        $stmt = $this->conn->query("SELECT * FROM clientes ORDER BY nome ASC");
+        $stmt = $this->conn->query("SELECT * FROM usuarios WHERE tipo = 'cliente' ORDER BY nome ASC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function buscarClientePorId($id) {
-        $stmt = $this->conn->prepare("SELECT * FROM clientes WHERE id = ?");
+        $stmt = $this->conn->prepare("SELECT * FROM usuarios WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function debitarSaldoCliente($cliente_id, $valor_debitar) {
-        $stmt = $this->conn->prepare("UPDATE clientes SET saldo_credito = GREATEST(0, saldo_credito - ?) WHERE id = ?");
+        $stmt = $this->conn->prepare("UPDATE usuarios SET saldo_credito = GREATEST(0, saldo_credito - ?) WHERE id = ?");
         return $stmt->execute([$valor_debitar, $cliente_id]);
     }
 
-    public function cadastrarLoteCompleto($cpf, $nome, $telefone, $pix, $descricao_lote, $pecas) {
+    public function cadastrarLoteCompleto($cpf, $nome, $email, $telefone, $pix, $descricao_lote, $pecas) {
         try {
             $this->conn->beginTransaction();
 
-            $stmt = $this->conn->prepare("SELECT id FROM clientes WHERE cpf = ?");
+            $stmt = $this->conn->prepare("SELECT id FROM usuarios WHERE cpf = ?");
             $stmt->execute([$cpf]);
             $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($cliente) {
                 $cliente_id = $cliente['id'];
-                $stmt_up = $this->conn->prepare("UPDATE clientes SET nome = ?, telefone = ?, chave_pix = ? WHERE id = ?");
+                $stmt_up = $this->conn->prepare("UPDATE usuarios SET nome = ?, telefone = ?, chave_pix = ? WHERE id = ?");
                 $stmt_up->execute([$nome, $telefone, $pix, $cliente_id]);
             } else {
-                $stmt = $this->conn->prepare("INSERT INTO clientes (cpf, nome, telefone, chave_pix) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$cpf, $nome, $telefone, $pix]);
+                $apenas_numeros_cpf = preg_replace('/[^0-9]/', '', $cpf);
+                $senha_temporaria = 'brecho' . substr($apenas_numeros_cpf, 0, 4); 
+                $senha_hash = password_hash($senha_temporaria, PASSWORD_DEFAULT);
+
+                $stmt = $this->conn->prepare("INSERT INTO usuarios (cpf, nome, email, senha, telefone, chave_pix, tipo) VALUES (?, ?, ?, ?, ?, ?, 'cliente')");
+                $stmt->execute([$cpf, $nome, $email, $senha_hash, $telefone, $pix]);
                 $cliente_id = $this->conn->lastInsertId();
+
+                $assunto = "Sua conta no Brechó foi criada!";
+                $mensagem = "Olá $nome,\n\nRecebemos suas peças e sua conta foi criada com sucesso em nosso sistema!\n\n";
+                $mensagem .= "Seu login: $email\n";
+                $mensagem .= "Sua senha provisória: $senha_temporaria\n\n";
+                $mensagem .= "Recomendamos que você acesse o sistema para acompanhar sua proposta e altere sua senha no primeiro acesso.\n\nAtenciosamente,\nEquipe do Brechó";
+                
+                $headers = "From: nao-responda@seubrecho.com.br\r\n";
+                $headers .= "Reply-To: contato@seubrecho.com.br\r\n";
+                
+                // O @ oculta erros caso você esteja testando em localhost sem servidor SMTP configurado (XAMPP/WAMP)
+                @mail($email, $assunto, $mensagem, $headers);
             }
 
             $token = bin2hex(random_bytes(3));
-
             $stmt = $this->conn->prepare("INSERT INTO lotes (cliente_id, descricao, status, token) VALUES (?, ?, 1, ?)");
             $stmt->execute([$cliente_id, $descricao_lote, $token]);
             $lote_id = $this->conn->lastInsertId();
@@ -63,6 +78,7 @@ class LoteModel {
             return true;
         } catch (Exception $e) {
             $this->conn->rollBack();
+            // die("Erro no banco: " . $e->getMessage());
             return false;
         }
     }
@@ -76,7 +92,7 @@ class LoteModel {
         $stmt = $this->conn->prepare("
             SELECT l.*, c.cpf, c.nome as cliente_nome, c.telefone, c.chave_pix, c.saldo_credito 
             FROM lotes l 
-            JOIN clientes c ON l.cliente_id = c.id 
+            JOIN usuarios c ON l.cliente_id = c.id 
             WHERE l.id = ?
         ");
         $stmt->execute([$id]);
@@ -130,7 +146,7 @@ class LoteModel {
         $stmt = $this->conn->prepare("
             SELECT l.*, c.id as cliente_id, c.nome as cliente_nome 
             FROM lotes l 
-            JOIN clientes c ON l.cliente_id = c.id 
+            JOIN usuarios c ON l.cliente_id = c.id 
             WHERE l.token = ?
         ");
         $stmt->execute([$token]);
@@ -163,7 +179,7 @@ class LoteModel {
 
                 if ($novo_status == 5) {
                     $valor_com_bonus = $lote['valor_proposta'] + ($lote['valor_proposta'] * 0.15);
-                    $stmt_saldo = $this->conn->prepare("UPDATE clientes SET saldo_credito = saldo_credito + ? WHERE id = ?");
+                    $stmt_saldo = $this->conn->prepare("UPDATE usuarios SET saldo_credito = saldo_credito + ? WHERE id = ?");
                     $stmt_saldo->execute([$valor_com_bonus, $lote['cliente_id']]);
                 }
             }
@@ -185,7 +201,7 @@ class LoteModel {
         $stmt = $this->conn->query("
             SELECT l.*, c.nome as cliente_nome, c.telefone 
             FROM lotes l 
-            JOIN clientes c ON l.cliente_id = c.id 
+            JOIN usuarios c ON l.cliente_id = c.id 
             ORDER BY l.id DESC
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -204,7 +220,7 @@ class LoteModel {
             $stmt->execute([$lote_id]);
             $cliente_id = $stmt->fetchColumn();
 
-            $stmt_c = $this->conn->prepare("UPDATE clientes SET cpf = ?, nome = ?, telefone = ?, chave_pix = ? WHERE id = ?");
+            $stmt_c = $this->conn->prepare("UPDATE usuarios SET cpf = ?, nome = ?, telefone = ?, chave_pix = ? WHERE id = ?");
             $stmt_c->execute([$cpf, $nome, $telefone, $pix, $cliente_id]);
 
             $stmt_l = $this->conn->prepare("UPDATE lotes SET descricao = ? WHERE id = ?");

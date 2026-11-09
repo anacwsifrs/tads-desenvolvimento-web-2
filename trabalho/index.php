@@ -96,6 +96,7 @@ if ($acao == 'login') {
 } elseif ($acao == 'salvar') {
     $cpf = $_POST['cpf'];
     $nome = $_POST['nome'];
+    $email = $_POST['email'];
     $telefone = $_POST['telefone'];
     $pix = $_POST['pix'];
     $descricao_lote = $_POST['descricao_lote'];
@@ -113,7 +114,7 @@ if ($acao == 'login') {
         }
     }
 
-    if ($loteModel->cadastrarLoteCompleto($cpf, $nome, $telefone, $pix, $descricao_lote, $pecas)) {
+    if ($loteModel->cadastrarLoteCompleto($cpf, $nome, $email, $telefone, $pix, $descricao_lote, $pecas)) {
         echo "<script>alert('Lote e peças cadastrados com sucesso!'); window.location.href='index.php?acao=listar';</script>";
     } else {
         echo "<script>alert('Erro ao cadastrar lote.'); window.history.back();</script>";

@@ -27,6 +27,7 @@
         <div id="aviso-cliente" class="aviso-cliente">✓ Cliente encontrado! Dados carregados automaticamente.</div>
     </div>
     <div class="form-group"><label>Nome Completo:</label><input type="text" id="nome" name="nome" required></div>
+    <div class="form-group"><label>E-mail:</label><input type="email" id="email" name="email" required></div>
     <div class="form-group"><label>WhatsApp:</label><input type="text" id="telefone" name="telefone" required></div>
     <div class="form-group"><label>Chave PIX:</label><input type="text" id="pix" name="pix" required></div>
 
@@ -70,6 +71,7 @@
                 $.getJSON('index.php?acao=buscar_cliente&cpf=' + encodeURIComponent(cpf), function(data) {
                     if (data && data.id) {
                         $('#nome').val(data.nome);
+                        $('#email').val(data.email);
                         $('#telefone').val(data.telefone);
                         $('#pix').val(data.chave_pix);
                         $('#aviso-cliente').fadeIn();
