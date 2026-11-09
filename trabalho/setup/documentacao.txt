@@ -1,5 +1,7 @@
 Projeto: Sistema de Gestão e Avaliação para Brechós
 
+------ REESCREVER DEPOIS 
+
 1. Visão Geral do Sistema
 O projeto consiste em um sistema web para gerenciar o processo de um brechó físico: a entrada, avaliação e negociação de lotes de roupas usadas. 
 O objetivo principal é digitalizar e automatizar o fluxo de consignação e compra, garantindo controle para a loja e transparência para o cliente.
@@ -16,6 +18,3 @@ Decisão do Cliente: Na tela exclusiva do link, o cliente pode tomar uma das seg
 Gestão de Prazos e Consequências: O sistema trabalha com regras de tempo de 3 dias úteis:
     Se o cliente não responder à proposta em 3 dias úteis, o lote é considerado abandonado e as peças são destinadas para doação.
     Se o cliente recusar a proposta, ele tem 3 dias úteis para retirar as peças na loja. Caso não compareça, as peças também são destinadas para doação.
-
-admin@brecho.com
-admin123
