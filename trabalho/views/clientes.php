@@ -1,7 +1,7 @@
 <?php require_once 'header.php'; ?>
 
 <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 1000px; margin: auto; background-color: #f8f9fa; }
+    body { font-family: Arial, sans-serif; padding: 20px;}
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .btn-voltar { padding: 10px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
     table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }

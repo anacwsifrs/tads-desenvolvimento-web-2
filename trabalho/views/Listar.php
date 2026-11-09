@@ -1,7 +1,7 @@
 <?php require_once 'header.php'; ?>
 
 <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 1200px; margin: auto; background-color: #f8f9fa; }
+    body { font-family: Arial, sans-serif;}
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .nav-btns { display: flex; gap: 10px; }
     .btn-menu { padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }

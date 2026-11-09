@@ -1,5 +1,6 @@
 Frescura:
 * melhorar as categorias pré-cadastradas em lote
+* Tela de Perfil: criar uma rota acao=perfil e uma views/perfil.php que identifique quem está logado via $_SESSION['usuario_id'] e libere a edição de senha e upload da foto de perfil.
 
 Pede na especificação:
 * melhorar css + usar react em alguma coisa
@@ -8,27 +9,32 @@ Pede na especificação:
 * Tela específica para detalhar apenas 1 peça clicado (deve funcionar para todos os recursos um get one dinamicamente, apenas 1 PHP para todos). (Ver se tem isso + talvez melhorar a peça com upload de foto para a vitrine, display da peça + foto e ao clicar no getOne dá pra ver. dá pra melhorar a entidade peça para guardar tamanho + cor + marca + estado da peça + observações)
 * Deve possuir um botão de compra que manda para a tela do carrinho;
 * Implementar duas telas de listagens públicas (vitrine brechó que lista todas as peças cadastradas + falta outra)
-
-Testar:
-* Tela de cadastro de usuário, com validação de campos (HTML e/ou JS) e no backend também; (testar se funciona + validar se o código faz isso)
-* Testar se funciona Integração com Gemini API: Adicionar a requisição para sugestão de preço/descrição por IA na tela de avaliação. Ou pra pessoa ver a vitrine.
-* Validar se tenho um arquivo PHP separado só para conexão com o banco e se dou include dele em todas as outras páginas que acessam BD.
-* Validar se temos AJAX e SPA pelo menos em um recurso
 * Hospedar Locaweb 
 
+Testar:
+* Testar se funciona Integração com Gemini API: Adicionar a requisição para sugestão de preço/descrição por IA na tela de avaliação. Ou pra pessoa ver a vitrine.
+* Validar se temos AJAX e SPA pelo menos em um recurso
+
 Bugs:
-* painel admin não tem footer nem header
+* fui criar um lote + cliente novo para testar e deu erro, mas não consegui pegar no console nem na aba network o que falhou. quero aproveitar esse momento para garantir que o cadastro tenha validação de campos (HTML e/ou JS) e no backend também. funciona quando o cliente cria a própria conta 
+
+----------------------------------------------------------------------
+
+Feito:
+* Tela de termos de serviço e política de plágio (muito importante para regras de LGPD)
+* Sistema de login ok, cadastro de foto ok, recuperação de senha não ok porque envio de email nao funciona
+* Todas as telas devem conter uma tag meta plagiarism
+* Tenho um arquivo PHP separado só para conexão com o banco e dou include dele em todas as outras páginas que acessam BD.
+
+----------------------------------------------------------------------
 
 Na hora de enviar o trabalho:
 * Incluir o SQL do banco entre os arquivos upados .sql exportado do PHPMyAdmin
 * Entrega via github + zipado e entregue no moodle
 * Envie o endereço do site nos comentários do envio ou em um arquivo txt.
 
-Feito:
-* Tela de termos de serviço e política de plágio (muito importante para regras de LGPD)
-* Sistema de login ok, cadastro de foto ok, recuperação de senha não ok porque envio de email nao funciona
-* Todas as telas devem conter uma tag meta plagiarism
+----------------------------------------------------------------------
 
 Credenciais admin
-admin@brecho.com
+2025000434@aluno.canoas.ifrs.edu.br
 admin123

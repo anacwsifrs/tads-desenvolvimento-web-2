@@ -1,7 +1,7 @@
 <?php require_once 'header.php'; ?>
 
 <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: auto; }
+    body { font-family: Arial, sans-serif;}
     .card { background: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 20px; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #ccc; padding: 10px; text-align: left; vertical-align: middle; }

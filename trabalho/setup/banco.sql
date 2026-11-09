@@ -83,7 +83,7 @@ INSERT INTO tags (nome) VALUES
 ('Sem Avarias'), ('Sem Etiqueta'), ('Com Pequeno Desgaste'), ('Marca Famosa'), ('Peça Vintage');
 
 INSERT INTO usuarios (cpf, nome, email, senha, telefone, tipo) VALUES 
-('000.000.000-00', 'Administrador Brechó', 'admin@brecho.com', '$2y$10$eE.l9XQ4jJ4dJjM5Bq7I.e123456789012345678901234567890', '11999999999', 'admin');
+('000.000.000-00', 'Administrador Brechó', '2025000434@aluno.canoas.ifrs.edu.br', '$2y$10$eE.l9XQ4jJ4dJjM5Bq7I.e123456789012345678901234567890', '11999999999', 'admin');
 
 INSERT INTO usuarios (cpf, nome, email, senha, telefone, chave_pix, saldo_credito) VALUES 
 ('111.111.111-11', 'Maria Oliveira', 'cliente@email.com', '$2y$10$eE.l9XQ4jJ4dJjM5Bq7I.e123456789012345678901234567890', '11988888888', 'maria@pix.com', 0.00);

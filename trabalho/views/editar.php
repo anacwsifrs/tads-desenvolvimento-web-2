@@ -1,7 +1,7 @@
 <?php require_once 'header.php'; ?>
 
 <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    body { font-family: Arial, sans-serif;}
     .form-group { margin-bottom: 15px; }
     label { display: block; margin-bottom: 5px; font-weight: bold; }
     input[type="text"] { width: 100%; padding: 8px; box-sizing: border-box; }
