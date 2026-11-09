@@ -1,6 +1,5 @@
 Frescura:
 * melhorar as categorias pré-cadastradas em lote
-* Tela de Perfil: criar uma rota acao=perfil e uma views/perfil.php que identifique quem está logado via $_SESSION['usuario_id'] e libere a edição de senha e upload da foto de perfil.
 
 Pede na especificação:
 * melhorar css + usar react em alguma coisa
@@ -13,7 +12,6 @@ Pede na especificação:
 
 Testar:
 * Testar se funciona Integração com Gemini API: Adicionar a requisição para sugestão de preço/descrição por IA na tela de avaliação. Ou pra pessoa ver a vitrine.
-* Validar se temos AJAX e SPA pelo menos em um recurso
 
 ----------------------------------------------------------------------
 
@@ -22,6 +20,8 @@ Feito:
 * Sistema de login ok, cadastro de foto ok, recuperação de senha não ok porque envio de email nao funciona
 * Todas as telas devem conter uma tag meta plagiarism
 * Tenho um arquivo PHP separado só para conexão com o banco e dou include dele em todas as outras páginas que acessam BD.
+* Tenho AJAX em views/cadastrar.php: quando você digita o CPF, se o cliente já existe, o nome, e-mail, telefone e chave PIX do cliente são preenchidos automaticamente na tela sem dar refresh.
+* Tenho SPA na tela de perfil
 
 ----------------------------------------------------------------------
 
@@ -37,3 +37,5 @@ Credenciais admin
 admin123
 
 a senha padrão gerada é sempre a palavra brecho seguida dos 4 primeiros números do CPF
+
+envio de email não funciona no ambiente local

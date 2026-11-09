@@ -229,7 +229,62 @@ if ($acao == 'login') {
     } else {
         echo "<script>alert('Erro ao debitar saldo.'); window.history.back();</script>";
     }
+} elseif ($acao == 'perfil') {
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = ?");
+    $stmt->execute([$_SESSION['usuario_id']]);
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+    require_once 'views/perfil.php';
 
+} elseif ($acao == 'api_atualizar_perfil') {
+    header('Content-Type: application/json');
+    $id = $_SESSION['usuario_id'];
+    $nome = $_POST['nome'] ?? '';
+    $telefone = $_POST['telefone'] ?? '';
+    $pix = $_POST['pix'] ?? '';
+
+    $foto_query = "";
+    $params = [$nome, $telefone, $pix, $id];
+
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
+        $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+        $nomeFoto = "perfil_" . time() . "_" . uniqid() . "." . $ext;
+        if (!is_dir('uploads')) { mkdir('uploads', 0777, true); }
+        if (move_uploaded_file($_FILES['foto']['tmp_name'], 'uploads/' . $nomeFoto)) {
+            $foto_query = ", foto = ?";
+            $params = [$nome, $telefone, $pix, $nomeFoto, $id];
+            $_SESSION['usuario_foto'] = $nomeFoto;
+        }
+    }
+
+    try {
+        $stmt = $pdo->prepare("UPDATE usuarios SET nome = ?, telefone = ?, chave_pix = ? $foto_query WHERE id = ?");
+        $stmt->execute($params);
+        $_SESSION['usuario_nome'] = $nome;
+        echo json_encode(['sucesso' => true, 'mensagem' => 'Dados do perfil atualizados com sucesso!']);
+    } catch (Exception $e) {
+        echo json_encode(['sucesso' => false, 'mensagem' => 'Erro ao atualizar o perfil.']);
+    }
+    exit;
+
+} elseif ($acao == 'api_atualizar_senha') {
+    header('Content-Type: application/json');
+    $id = $_SESSION['usuario_id'];
+    $senha_atual = $_POST['senha_atual'] ?? '';
+    $nova_senha = $_POST['nova_senha'] ?? '';
+
+    $stmt = $pdo->prepare("SELECT senha FROM usuarios WHERE id = ?");
+    $stmt->execute([$id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (password_verify($senha_atual, $user['senha'])) {
+        $senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
+        $stmt_up = $pdo->prepare("UPDATE usuarios SET senha = ? WHERE id = ?");
+        $stmt_up->execute([$senha_hash, $id]);
+        echo json_encode(['sucesso' => true, 'mensagem' => 'Senha redefinida com segurança!']);
+    } else {
+        echo json_encode(['sucesso' => false, 'mensagem' => 'A senha atual está incorreta.']);
+    }
+    exit;
 } else {
     header("Location: index.php?acao=vitrine");
     exit;

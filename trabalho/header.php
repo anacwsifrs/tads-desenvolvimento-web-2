@@ -1,6 +1,4 @@
-<?php
-require_once __DIR__ . '/conexao.php';
-?>
+<?php require_once __DIR__ . '/conexao.php'; ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -15,7 +13,8 @@ require_once __DIR__ . '/conexao.php';
         nav a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; }
         nav a:hover { text-decoration: underline; }
         .container { max-width: 1100px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .user-badge { display: flex; align-items: center; gap: 10px; }
+        .user-badge { display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; transition: opacity 0.2s; }
+        .user-badge:hover { opacity: 0.85; text-decoration: underline; }
         .user-badge img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; }
         footer { text-align: center; padding: 15px; background: #e9ecef; margin-top: 30px; font-size: 14px; }
     </style>
@@ -42,10 +41,10 @@ require_once __DIR__ . '/conexao.php';
         </nav>
         
         <?php if (isset($_SESSION['usuario_id'])): ?>
-            <div class="user-badge">
+            <a href="index.php?acao=perfil" class="user-badge" title="Editar Meu Perfil">
                 <img src="uploads/<?= $_SESSION['usuario_foto'] ?>" alt="Foto">
                 <span><?= htmlspecialchars($_SESSION['usuario_nome']) ?></span>
-            </div>
+            </a>
         <?php endif; ?>
     </header>
     <div class="container">
