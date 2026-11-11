@@ -1,23 +1,24 @@
 Frescura:
 * melhorar as categorias pré-cadastradas em lote
-* combinar abas início e vitrine pública já que fazem a mesma coisa
-* botão olhinho pra senha
-* alerta antes de logout
+* botão olhinho pra senha - melhorar ícone
 * melhorar texto da tela de inicio
 * mudar nome brechó ecomoda
 * criar conta admin pra poder mandar as credenciais pro sor
 * criar chave pix ficticia
 * atualizar lgpd por causa do pix
-* rever questão do saldo, da pra deixar na conta do cliente e ele pode descontar no carrinho
-* depois de atualizar foto de perfil, dar f5
 * notificacoes
+* logs
 
 Pede na especificação:
 * melhorar/unificar css + usar react em alguma coisa + verificar se o código usa react e se usa as tecnologias em aula, os códigos do sor, etc
 * ver se a cota de tabelas + relacionamentos no bd foi atingida (6-8 tabelas, 2 cadastros simples, 1 cadastro 1 ..n, 2 cadastros n..n). aproveitar para revisar se as tabelas que temos fazem sentido.
-* Deve possuir um botão de compra que manda para a tela do carrinho;
 * Hospedar Locaweb 
 * implementar envio de email
+
+----------------------------------------------------------------------
+
+Fazendo:
+* rever questão do saldo, da pra deixar na conta do cliente e ele pode descontar no carrinho
 
 ----------------------------------------------------------------------
 
@@ -31,6 +32,7 @@ Feito:
 * Integração com Gemini API
 * Tela específica para detalhar apenas 1 peça clicado (deve funcionar para todos os recursos um get one dinamicamente, apenas 1 PHP para todos).
 * 2 telas de listagem públicas (início e vitrine)
+* Deve possuir um botão de compra que manda para a tela do carrinho;
 
 ----------------------------------------------------------------------
 

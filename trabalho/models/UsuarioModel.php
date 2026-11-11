@@ -43,5 +43,10 @@ class UsuarioModel {
         $stmt = $this->conn->prepare("UPDATE usuarios SET cpf = ?, nome = ?, telefone = ?, chave_pix = ? WHERE id = ?");
         return $stmt->execute([$cpf, $nome, $telefone, $pix, $id]);
     }
+
+    public function atualizarUsuarioAdmin($id, $nome, $telefone, $pix, $saldo) {
+        $stmt = $this->pdo->prepare("UPDATE usuarios SET nome = ?, telefone = ?, chave_pix = ?, saldo_credito = ? WHERE id = ?");
+        return $stmt->execute([$nome, $telefone, $pix, $saldo, $id]);
+    }
 }
 ?>

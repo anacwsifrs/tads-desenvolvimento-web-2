@@ -145,22 +145,6 @@ class UsuarioController {
         require_once 'views/admin/clientes.php';
     }
 
-    public function debitar_saldo() {
-        $this->verificarAdmin();
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $cliente_id = $_POST['cliente_id'] ?? 0;
-            $valor_gasto = $_POST['valor_gasto'] ?? 0;
-            $justificativa = $_POST['justificativa'] ?? '';
-
-            if ($this->usuarioModel->debitarSaldoCliente($cliente_id, $valor_gasto)) {
-                echo "<script>alert('Saldo debitado com sucesso! Motivo: $justificativa'); window.location.href='index.php?acao=clientes';</script>";
-            } else {
-                echo "<script>alert('Erro ao debitar saldo.'); window.history.back();</script>";
-            }
-        }
-    }
-
     private function verificarAdmin() {
         if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'admin') {
             header("Location: index.php?acao=meus_lotes");
@@ -171,6 +155,39 @@ class UsuarioController {
     private function atualizarFotoPerfil($id, $caminhoFoto) {
         $stmt = $this->pdo->prepare("UPDATE usuarios SET foto = ? WHERE id = ?");
         $stmt->execute([$caminhoFoto, $id]);
+    }
+
+    public function ver_cliente() {
+        $this->verificarAdmin();
+        $id = $_GET['id'] ?? 0;
+        $cliente = $this->usuarioModel->buscarClientePorId($id);
+        $readonly = true;
+        require_once 'views/admin/form_cliente.php';
+    }
+
+    public function editar_cliente() {
+        $this->verificarAdmin();
+        $id = $_GET['id'] ?? 0;
+        $cliente = $this->usuarioModel->buscarClientePorId($id);
+        $readonly = false;
+        require_once 'views/admin/form_cliente.php';
+    }
+
+    public function salvar_cliente_admin() {
+        $this->verificarAdmin();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'] ?? 0;
+            $nome = $_POST['nome'] ?? '';
+            $telefone = $_POST['telefone'] ?? '';
+            $pix = $_POST['pix'] ?? '';
+            $saldo = $_POST['saldo_credito'] ?? 0;
+
+            if ($this->usuarioModel->atualizarUsuarioAdmin($id, $nome, $telefone, $pix, $saldo)) {
+                echo "<script>alert('Cliente atualizado com sucesso!'); window.location.href='index.php?acao=clientes';</script>";
+            } else {
+                echo "<script>alert('Erro ao atualizar cliente.'); window.history.back();</script>";
+            }
+        }
     }
 }
 ?>

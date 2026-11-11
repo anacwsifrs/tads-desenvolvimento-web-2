@@ -12,12 +12,24 @@
     </div>
     <div style="margin-bottom:10px;">
         <label>Senha:</label><br>
-        <input type="password" name="senha" required style="width:100%; padding:8px; border: 1px solid #ccc; border-radius: 4px;">
+        <div style="position: relative; width: 100%;">
+            <input type="password" id="senha" name="senha" required style="width: 100%; padding-right: 40px;">
+            <button type="button" onclick="toggleSenha('senha')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
+                👁️
+            </button>
+        </div>
     </div>
     <button type="submit" style="padding:10px 20px; background:#007bff; color:white; border:none; border-radius: 4px; cursor:pointer; font-weight: bold;">Entrar</button>
 </form>
 <p style="margin-top:15px;">
     Não tem conta? <a href="index.php?acao=cadastro" style="color: #007bff;">Cadastre-se aqui</a> | <a href="index.php?acao=recuperar_senha" style="color: #007bff;">Esqueceu a senha?</a>
 </p>
+
+<script>
+function toggleSenha(inputId) {
+    const input = document.getElementById(inputId);
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+</script>
 
 <?php require_once 'views/include/footer.php'; ?>

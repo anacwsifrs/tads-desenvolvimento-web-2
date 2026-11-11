@@ -34,7 +34,6 @@
 <div class="header">
     <h2>Painel Geral - Lotes de Avaliação</h2>
     <div class="nav-btns">
-        <a href="index.php?acao=clientes" class="btn-menu">💳 Ver Saldo dos Clientes</a>
         <a href="index.php?acao=cadastrar" class="btn-menu btn-novo">+ Registrar Novo Lote</a>
     </div>
 </div>

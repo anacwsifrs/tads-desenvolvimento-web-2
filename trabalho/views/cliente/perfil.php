@@ -63,11 +63,21 @@
     <form id="form-senha">
         <div class="form-group">
             <label>Senha Atual:</label>
-            <input type="password" name="senha_atual" required>
+            <div style="position: relative; width: 100%;">
+                <input type="password" id="senha_atual" name="senha_atual" required style="width: 100%; padding-right: 40px;">
+                <button type="button" onclick="toggleSenha('senha_atual')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
+                    👁️
+                </button>
+            </div>
         </div>
         <div class="form-group">
             <label>Nova Senha:</label>
-            <input type="password" name="nova_senha" required minlength="6">
+            <div style="position: relative; width: 100%;">
+                <input type="password" id="nova_senha" name="nova_senha" required style="width: 100%; padding-right: 40px;">
+                <button type="button" onclick="toggleSenha('nova_senha')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
+                    👁️
+                </button>
+            </div>
         </div>
         <button type="submit" class="btn-submit" style="background: #007bff;">Atualizar Senha</button>
     </form>
@@ -100,7 +110,14 @@
             body: formData
         })
         .then(response => response.json())
-        .then(data => mostrarMensagem('feedback-dados', data.sucesso, data.mensagem))
+        .then(data => {
+            mostrarMensagem('feedback-dados', data.sucesso, data.mensagem);
+            if (data.sucesso) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 800);
+            }
+        })
         .catch(error => mostrarMensagem('feedback-dados', false, 'Erro de comunicação com o servidor.'));
     });
 
@@ -119,6 +136,11 @@
         })
         .catch(error => mostrarMensagem('feedback-senha', false, 'Erro de comunicação com o servidor.'));
     });
+
+    function toggleSenha(inputId) {
+        const input = document.getElementById(inputId);
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
 </script>
 
 <?php require_once 'views/include/footer.php'; ?>

@@ -94,6 +94,7 @@ $qtdCarrinho = isset($_SESSION['carrinho']) ? count($_SESSION['carrinho']) : 0;
                         <?php if ($_SESSION['usuario_tipo'] === 'admin'): ?>
                             <a href="index.php?acao=listar">📋 Painel Lotes</a>
                             <a href="index.php?acao=gerenciar_pedidos">🛍️ Painel Vendas</a>
+                            <a href="index.php?acao=clientes">👥 Painel Usuários</a>
                         <?php else: ?>
                             <a href="index.php?acao=meus_lotes">📦 Meus Lotes</a>
                             <a href="index.php?acao=meus_pedidos">🛒 Minhas Compras</a>
@@ -101,7 +102,7 @@ $qtdCarrinho = isset($_SESSION['carrinho']) ? count($_SESSION['carrinho']) : 0;
 
                         <div class="dropdown-divider"></div>
 
-                        <a href="index.php?acao=logout" style="color: #dc3545; font-weight: bold;">🚪 Sair</a>
+                        <a href="index.php?acao=logout" style="color: #dc3545; font-weight: bold;" onclick="return confirm('Tem certeza que deseja sair do sistema?');">🚪 Sair</a>
                     </div>
                 </div>
             <?php else: ?>

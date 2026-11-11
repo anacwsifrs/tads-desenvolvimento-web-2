@@ -24,8 +24,11 @@ switch ($acao) {
     case 'api_buscar_cliente':
     case 'api_atualizar_perfil':
     case 'api_atualizar_senha':
+
     case 'clientes':
-    case 'debitar_saldo':
+    case 'ver_cliente':
+    case 'editar_cliente':
+    case 'salvar_cliente_admin':
         $controller = new UsuarioController($pdo);
         if (method_exists($controller, $acao)) {
             $controller->$acao();

@@ -3,19 +3,17 @@
 <style>
     body { font-family: Arial, sans-serif;}
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .btn-voltar { padding: 10px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
     table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; }
+    th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; vertical-align: middle;}
     th { background-color: #e9ecef; }
-    .saldo-positivo { font-weight: bold; color: #28a745; font-size: 16px; }
-    .form-debitar { display: flex; gap: 5px; }
-    .form-debitar input[type="number"] { width: 90px; padding: 5px; }
-    .form-debitar input[type="text"] { width: 180px; padding: 5px; }
-    .btn-debitar { background: #dc3545; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 3px; font-weight: bold; }
+    .saldo-positivo { font-weight: bold; color: #28a745; font-size: 15px; }
+    .btn-acao { padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 14px; margin-right: 5px; display: inline-block;}
+    .btn-ver { background: #17a2b8; color: white; }
+    .btn-editar { background: #ffc107; color: #333; font-weight: bold; }
 </style>
+
 <div class="header">
-    <h2>Gestão de Clientes e Crédito em Loja</h2>
-    <a href="index.php" class="btn-voltar">← Voltar ao Painel Geral</a>
+    <h2>👥 Painel de Usuários</h2>
 </div>
 
 <table>
@@ -24,8 +22,8 @@
             <th>CPF</th>
             <th>Nome</th>
             <th>WhatsApp</th>
-            <th>Saldo Disponível (Créditos)</th>
-            <th>Debitar Saldo Utilizado em Loja</th>
+            <th>Saldo (Créditos)</th>
+            <th style="width: 100px; text-align: center;">Ações</th>
         </tr>
     </thead>
     <tbody>
@@ -42,17 +40,9 @@
                             R$ <?= number_format($c['saldo_credito'], 2, ',', '.') ?>
                         </span>
                     </td>
-                    <td>
-                        <?php if ($c['saldo_credito'] > 0): ?>
-                            <form action="index.php?acao=debitar_saldo" method="POST" class="form-debitar" onsubmit="return confirm('Confirma o débito no saldo deste cliente?')">
-                                <input type="hidden" name="cliente_id" value="<?= $c['id'] ?>">
-                                <input type="number" step="0.01" max="<?= $c['saldo_credito'] ?>" min="0.01" name="valor_gasto" placeholder="Valor R$" required>
-                                <input type="text" name="justificativa" placeholder="Motivo / Peça comprada" required>
-                                <button type="submit" class="btn-debitar">Debitar</button>
-                            </form>
-                        <?php else: ?>
-                            <small style="color:#888;">Sem saldo disponível</small>
-                        <?php endif; ?>
+                    <td style="text-align: center;">
+                        <a href="index.php?acao=ver_cliente&id=<?= $c['id'] ?>" class="btn-acao btn-ver" title="Visualizar">👁️</a>
+                        <a href="index.php?acao=editar_cliente&id=<?= $c['id'] ?>" class="btn-acao btn-editar" title="Editar">✏️</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
