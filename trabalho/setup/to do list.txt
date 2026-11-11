@@ -37,14 +37,3 @@ Na hora de enviar o trabalho:
 * Envie o endereço do site nos comentários do envio ou em um arquivo txt.
 
 ----------------------------------------------------------------------
-
-Credenciais admin
-2025000434@aluno.canoas.ifrs.edu.br
-admin123
-
-a senha padrão gerada é sempre a palavra brecho seguida dos 4 primeiros números do CPF
-
-envio de email não funciona no ambiente local
-
-ao resetar o banco, rodar o update
-UPDATE usuarios SET senha = '" . password_hash('admin123', PASSWORD_DEFAULT) . "' ...

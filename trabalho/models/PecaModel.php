@@ -55,10 +55,12 @@ class PecaModel {
 
     public function listarTodasPecasPublicas() {
         $stmt = $this->pdo->query("
-            SELECT p.*, l.status as lote_status 
+            SELECT p.*, c.nome AS categoria_nome 
             FROM pecas p 
             JOIN lotes l ON p.lote_id = l.id 
-            WHERE l.status = 3 AND p.status_avaliacao = 1
+            JOIN categorias c ON p.categoria_id = c.id 
+            WHERE p.status_avaliacao = 1 AND l.status IN (4, 5)
+            ORDER BY p.id DESC
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

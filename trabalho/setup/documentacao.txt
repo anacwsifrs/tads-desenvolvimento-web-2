@@ -1,20 +1,16 @@
-Projeto: Sistema de Gestão e Avaliação para Brechós
+Status Lote:
+1 – Aguardando Triagem
+2 – Em Avaliação
+3 – Aguardando Resposta / Proposta Pronta
+4 – Aceito (PIX)
+5 – Aceito (Crédito)
+6 – Recusado
+7 – Doado
 
------- REESCREVER DEPOIS 
+Credenciais admin
+2025000434@aluno.canoas.ifrs.edu.br
+admin123
 
-1. Visão Geral do Sistema
-O projeto consiste em um sistema web para gerenciar o processo de um brechó físico: a entrada, avaliação e negociação de lotes de roupas usadas. 
-O objetivo principal é digitalizar e automatizar o fluxo de consignação e compra, garantindo controle para a loja e transparência para o cliente.
+A senha padrão gerada é sempre a palavra brecho seguida dos 4 primeiros números do CPF
 
-2. Regra de Negócio
-O sistema opera baseado no ciclo de vida de um "Lote", passando pelas etapas:
-Recebimento e Cadastro: O cliente entrega uma sacola de roupas na loja. O funcionário cadastra o cliente (Nome, WhatsApp, Chave PIX) e abre um novo Lote no sistema, que recebe o status inicial de Aguardando Triagem.
-Avaliação e Proposta: Um avaliador do brechó analisa as peças, categoriza o lote e define o que será comprado/consignado. O funcionário altera o status do lote para Aguardando Resposta e insere o valor financeiro da proposta.
-Notificação via Token: O sistema gera um link único para aquele lote e o cliente o acessa para visualizar sua proposta.
-Decisão do Cliente: Na tela exclusiva do link, o cliente pode tomar uma das seguintes decisões:
-    Aceitar em PIX: O funcionário vai enviar um pix com valor base oferecido.
-    Aceitar em Créditos da Loja: Recebe o valor oferecido com um bônus de 15% de acréscimo para gastar no próprio brechó.
-    Recusar: O cliente opta por não fechar negócio.
-Gestão de Prazos e Consequências: O sistema trabalha com regras de tempo de 3 dias úteis:
-    Se o cliente não responder à proposta em 3 dias úteis, o lote é considerado abandonado e as peças são destinadas para doação.
-    Se o cliente recusar a proposta, ele tem 3 dias úteis para retirar as peças na loja. Caso não compareça, as peças também são destinadas para doação.
+Envio de email não funciona no ambiente local
