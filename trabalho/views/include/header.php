@@ -1,4 +1,3 @@
-<?php require_once 'config/conexao.php'; ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -21,7 +20,7 @@
 </head>
 <body>
     <header>
-        <h1><a href="index.php" style="color:white; text-decoration:none;">🛍️ Brechó EcoModa</a></h1>
+        <h1><a href="index.php?acao=inicio" style="color:white; text-decoration:none;">🛍️ Brechó EcoModa</a></h1>
         <nav>
             <a href="index.php?acao=inicio">Início</a>
             <a href="index.php?acao=vitrine">Vitrine</a>
@@ -41,9 +40,14 @@
         </nav>
         
         <?php if (isset($_SESSION['usuario_id'])): ?>
+            <?php 
+                $fotoUsuario = (!empty($_SESSION['usuario_foto']) && file_exists('uploads/' . $_SESSION['usuario_foto'])) 
+                    ? 'uploads/' . $_SESSION['usuario_foto'] 
+                    : 'assets/img/default.png';
+            ?>
             <a href="index.php?acao=perfil" class="user-badge" title="Editar Meu Perfil">
-                <img src="uploads/<?= $_SESSION['usuario_foto'] ?>" alt="Foto">
-                <span><?= htmlspecialchars($_SESSION['usuario_nome']) ?></span>
+                <img src="<?= htmlspecialchars($fotoUsuario) ?>" alt="Foto do usuário">
+                <span><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Perfil') ?></span>
             </a>
         <?php endif; ?>
     </header>
