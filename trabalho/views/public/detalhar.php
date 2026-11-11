@@ -35,6 +35,7 @@ $preco_venda = $peca['valor_proposto'] * 1.4;
         <?php endif; ?>
         
         <h1 style="color:#28a745; margin:15px 0; font-size: 36px;">R$ <?= number_format($preco_venda, 2, ',', '.') ?></h1>
+        <a href="index.php?acao=adicionar_carrinho&id=<?= $peca['id'] ?>" style="display:inline-block; padding:12px 25px; background:#28a745; color:white; text-decoration:none; border-radius:5px; font-size:16px; font-weight:bold; margin-bottom:15px;">🛒 Adicionar ao Carrinho</a>
         <p style="color: #666; font-size: 13px;">* Esta peça deve ser adquirida presencialmente no balcão da loja.</p>
     </div>
 </div>

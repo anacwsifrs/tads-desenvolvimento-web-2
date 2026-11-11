@@ -59,7 +59,7 @@ class PecaModel {
             FROM pecas p 
             JOIN lotes l ON p.lote_id = l.id 
             JOIN categorias c ON p.categoria_id = c.id 
-            WHERE p.status_avaliacao = 1 AND l.status IN (4, 5)
+            WHERE p.status_avaliacao = 1 AND l.status IN (4, 5) AND p.disponivel = 1
             ORDER BY p.id DESC
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

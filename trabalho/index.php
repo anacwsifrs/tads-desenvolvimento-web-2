@@ -6,8 +6,9 @@ require_once 'controllers/LoteController.php';
 require_once 'controllers/PecaController.php';
 require_once 'controllers/UsuarioController.php';
 require_once 'controllers/ContatoController.php';
+require_once 'controllers/PedidoController.php';
 
-$acao = $_GET['acao'] ?? 'vitrine';
+$acao = $_GET['acao'] ?? 'inicio';
 
 switch ($acao) {
     case 'login':
@@ -34,13 +35,14 @@ switch ($acao) {
         break;
     
     case 'inicio':
-        require_once "views/public/inicio.php";
-        break;
-
     case 'vitrine':
     case 'detalhar':
         $controller = new PecaController($pdo);
-        $controller->$acao();
+        if (method_exists($controller, $acao)) {
+            $controller->$acao();
+        } else {
+            require_once "views/public/inicio.php";
+        }
         break;
 
     case 'listar':
@@ -64,6 +66,24 @@ switch ($acao) {
         }
         break;
 
+    case 'carrinho':
+    case 'adicionar_carrinho':
+    case 'remover_carrinho':
+    case 'finalizar_compra':
+    case 'meus_pedidos': 
+    case 'upload_comprovante_pix':
+    case 'gerenciar_pedidos': 
+    case 'aprovar_pedido':
+    case 'cancelar_pedido':
+        $controller = new PedidoController($pdo);
+        if (method_exists($controller, $acao)) {
+            $controller->$acao();
+        } else {
+            header("Location: index.php?acao=inicio");
+            exit;
+        }
+        break;
+
     case 'fale_conosco':
         $controller = new ContatoController($pdo);
         $controller->$acao();
@@ -74,7 +94,7 @@ switch ($acao) {
         break;
 
     default:
-        header("Location: index.php?acao=vitrine");
+        header("Location: index.php?acao=inicio");
         exit;
 }
 ?>

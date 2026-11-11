@@ -59,6 +59,7 @@ CREATE TABLE pecas (
     observacoes TEXT NULL,
     status_avaliacao INT DEFAULT 0,
     valor_proposto DECIMAL(10,2) NULL,
+    disponivel TINYINT(1) DEFAULT 1,
     FOREIGN KEY (lote_id) REFERENCES lotes(id) ON DELETE CASCADE,
     FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE RESTRICT
 );
@@ -78,6 +79,25 @@ CREATE TABLE mensagens_contato (
     assunto VARCHAR(150) NOT NULL,
     mensagem TEXT NOT NULL,
     enviado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE pedidos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id INT NOT NULL,
+    valor_total DECIMAL(10,2) NOT NULL,
+    status ENUM('Aguardando PIX', 'Aprovado', 'Cancelado') DEFAULT 'Aguardando PIX',
+    comprovante VARCHAR(255) NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cliente_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE pedido_itens (
+    pedido_id INT NOT NULL,
+    peca_id INT NOT NULL,
+    preco_venda DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (pedido_id, peca_id),
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
+    FOREIGN KEY (peca_id) REFERENCES pecas(id) ON DELETE RESTRICT
 );
 
 INSERT INTO categorias (nome) VALUES 

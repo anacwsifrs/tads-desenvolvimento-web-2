@@ -5,6 +5,12 @@ Frescura:
 * alerta antes de logout
 * melhorar texto da tela de inicio
 * mudar nome brechó ecomoda
+* criar conta admin pra poder mandar as credenciais pro sor
+* criar chave pix ficticia
+* atualizar lgpd por causa do pix
+* rever questão do saldo, da pra deixar na conta do cliente e ele pode descontar no carrinho
+* depois de atualizar foto de perfil, dar f5
+* notificacoes
 
 Pede na especificação:
 * melhorar/unificar css + usar react em alguma coisa + verificar se o código usa react e se usa as tecnologias em aula, os códigos do sor, etc

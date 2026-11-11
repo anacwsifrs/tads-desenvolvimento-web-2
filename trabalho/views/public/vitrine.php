@@ -23,7 +23,10 @@
                 <?php endif; ?>
 
                 <p style="font-size: 20px; color: #28a745; font-weight: bold; margin-top: 10px;">R$ <?= number_format($p['valor_proposto'] * 1.4, 2, ',', '.') ?></p>
-                <a href="index.php?acao=detalhar&id=<?= $p['id'] ?>" style="display:block; margin-top:10px; padding:10px; background:#007bff; color:white; text-decoration:none; border-radius:4px; font-size:14px; font-weight: bold;">Ver Detalhes</a>
+                <div style="display: flex; gap: 5px; margin-top: 10px;">
+                    <a href="index.php?acao=detalhar&id=<?= $p['id'] ?>" style="flex: 1; padding:10px; background:#007bff; color:white; text-decoration:none; border-radius:4px; font-size:14px; font-weight: bold;">🔍 Detalhes</a>
+                    <a href="index.php?acao=adicionar_carrinho&id=<?= $p['id'] ?>" style="flex: 1; padding:10px; background:#28a745; color:white; text-decoration:none; border-radius:4px; font-size:14px; font-weight: bold;">🛒 Comprar</a>
+                </div>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
