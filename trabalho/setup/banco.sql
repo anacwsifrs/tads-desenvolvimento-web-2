@@ -43,7 +43,6 @@ CREATE TABLE lotes (
     data_proposta DATETIME NULL,
     comprovante VARCHAR(255) NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    token VARCHAR(20) NULL,
     FOREIGN KEY (cliente_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 

@@ -1,7 +1,7 @@
 <?php require_once 'views/include/header.php';?>
 
 <h2>Meus Lotes Cadastrados</h2>
-<p style="margin-bottom:20px;">Acompanhe o status e as propostas dos seus lotes de roupas enviado ao brechó.</p>
+<p style="margin-bottom:20px;">Acompanhe o status e as propostas dos seus lotes de roupas enviados ao brechó.</p>
 
 <table style="width:100%; border-collapse:collapse; background:white; margin-top:10px;">
     <thead>
@@ -40,9 +40,9 @@
                     </td>
                     <td style="padding:10px; border:1px solid #ddd;">
                         <?php if ($l['status'] == 3): ?>
-                            <a href="index.php?acao=proposta&token=<?= $l['token'] ?>" style="padding:5px 10px; background:#28a745; color:white; text-decoration:none; border-radius:3px;">Ver Proposta</a>
+                            <a href="index.php?acao=proposta&id=<?= $l['id'] ?>" style="padding:5px 10px; background:#28a745; color:white; text-decoration:none; border-radius:3px;">Ver Proposta</a>
                         <?php else: ?>
-                            <a href="index.php?acao=proposta&token=<?= $l['token'] ?>" style="padding:5px 10px; background:#17a2b8; color:white; text-decoration:none; border-radius:3px;">Detalhes</a>
+                            <a href="index.php?acao=proposta&id=<?= $l['id'] ?>" style="padding:5px 10px; background:#17a2b8; color:white; text-decoration:none; border-radius:3px;">Detalhes</a>
                         <?php endif; ?>
                     </td>
                 </tr>

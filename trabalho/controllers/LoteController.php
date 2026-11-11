@@ -59,8 +59,7 @@ class LoteController {
                 $cliente_id = $this->usuarioModel->criarUsuario($cpf, $nome, $email, $senha_hash, $telefone, $pix);
             }
 
-            $token = bin2hex(random_bytes(10));
-            $lote_id = $this->loteModel->criarLote($cliente_id, $descricao_lote, $token);
+            $lote_id = $this->loteModel->criarLote($cliente_id, $descricao_lote);
             $diretorio_pecas = 'uploads/pecas/';
 
             if (!is_dir($diretorio_pecas)) {
@@ -142,27 +141,35 @@ class LoteController {
     }
 
     public function proposta() {
-        $token = $_GET['token'] ?? '';
-        $lote = $this->loteModel->buscarLotePorToken($token);
+        $this->verificarLogin();
+        $id = $_GET['id'] ?? 0;
+        $lote = $this->loteModel->buscarLotePorId($id);
 
         if (!$lote) {
-            die("<h3>Link inválido ou lote não encontrado.</h3>");
+            die("<h3>Lote não encontrado.</h3>");
+        }
+
+        if ($_SESSION['usuario_tipo'] !== 'admin' && $_SESSION['usuario_id'] != $lote['cliente_id']) {
+            die("<h3>Acesso não autorizado.</h3>");
         }
         
-        $cliente = $this->usuarioModel->buscarClientePorId($lote['cliente_id']);
-        $lote['cliente_nome'] = $cliente ? $cliente['nome'] : 'Cliente';
         $lote['pecas'] = $this->pecaModel->buscarPecasPorLote($lote['id']);
-        require_once 'views/public/proposta.php';
+        require_once 'views/cliente/proposta.php';
     }
 
     public function responder_proposta() {
+        $this->verificarLogin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $lote_id = $_POST['lote_id'];
-            $decisao = $_POST['decisao'];
-            $token = $_POST['token'];
+            $lote_id = $_POST['lote_id'] ?? 0;
+            $decisao = $_POST['decisao'] ?? 0;
+
+            $lote = $this->loteModel->buscarLotePorId($lote_id);
+            if (!$lote || ($_SESSION['usuario_tipo'] !== 'admin' && $_SESSION['usuario_id'] != $lote['cliente_id'])) {
+                die("<h3>Acesso negado.</h3>");
+            }
 
             $this->loteModel->atualizarStatusLote($lote_id, $decisao);
-            echo "<script>alert('Sua resposta foi registrada com sucesso!'); window.location.href='index.php?acao=proposta&token=$token';</script>";
+            echo "<script>alert('Sua resposta foi registrada com sucesso!'); window.location.href='index.php?acao=proposta&id=$lote_id';</script>";
             exit;
         }
     }

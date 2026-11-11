@@ -6,9 +6,9 @@ class LoteModel {
         $this->conn = $conexao;
     }
 
-    public function criarLote($cliente_id, $descricao_lote, $token) {
-        $stmt = $this->conn->prepare("INSERT INTO lotes (cliente_id, descricao, status, token) VALUES (?, ?, 1, ?)");
-        $stmt->execute([$cliente_id, $descricao_lote, $token]);
+    public function criarLote($cliente_id, $descricao_lote) {
+        $stmt = $this->conn->prepare("INSERT INTO lotes (cliente_id, descricao, status) VALUES (?, ?, 1)");
+        $stmt->execute([$cliente_id, $descricao_lote]);
         return $this->conn->lastInsertId();
     }
 
@@ -41,12 +41,6 @@ class LoteModel {
     public function salvarProposta($lote_id, $valor_total) {
         $stmt = $this->conn->prepare("UPDATE lotes SET valor_proposta = ?, status = 3, data_proposta = NOW() WHERE id = ?");
         return $stmt->execute([$valor_total, $lote_id]);
-    }
-
-    public function buscarLotePorToken($token) {
-        $stmt = $this->conn->prepare("SELECT * FROM lotes WHERE token = ?");
-        $stmt->execute([$token]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function salvarComprovante($lote_id, $nome_arquivo) {
