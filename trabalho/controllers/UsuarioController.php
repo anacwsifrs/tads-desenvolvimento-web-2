@@ -77,6 +77,7 @@ class UsuarioController {
     }
 
     public function api_atualizar_perfil() {
+        @ob_clean();
         header('Content-Type: application/json');
         
         if (!isset($_SESSION['usuario_id'])) {
@@ -115,6 +116,7 @@ class UsuarioController {
     }
 
     public function api_atualizar_senha() {
+        @ob_clean();
         header('Content-Type: application/json');
         if (!isset($_SESSION['usuario_id'])) {
             echo json_encode(['sucesso' => false, 'mensagem' => 'Sessão expirada.']);

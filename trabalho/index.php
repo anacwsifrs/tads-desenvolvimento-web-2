@@ -18,10 +18,19 @@ switch ($acao) {
         break;
 
     case 'perfil':
+    case 'cadastro':
+    case 'salvar_cadastro':
+    case 'api_buscar_cliente':
+    case 'api_atualizar_perfil':
+    case 'api_atualizar_senha':
     case 'clientes':
     case 'debitar_saldo':
         $controller = new UsuarioController($pdo);
-        $controller->$acao();
+        if (method_exists($controller, $acao)) {
+            $controller->$acao();
+        } else {
+            require_once "views/public/cadastro.php";
+        }
         break;
 
     case 'vitrine':
@@ -41,22 +50,13 @@ switch ($acao) {
     case 'editar':
     case 'salvar_edicao':
     case 'excluir':
+    case 'sugestao_ia':
     case 'upload_comprovante':
         $controller = new LoteController($pdo);
         if (method_exists($controller, $acao)) {
             $controller->$acao();
         } else {
             die("Ação não encontrada no LoteController.");
-        }
-        break;
-
-    case 'cadastro':
-    case 'salvar_cadastro':
-        $controller = new UsuarioController($pdo);
-        if (method_exists($controller, $acao)) {
-            $controller->$acao();
-        } else {
-            require_once "views/public/cadastro.php";
         }
         break;
 

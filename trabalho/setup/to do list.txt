@@ -7,8 +7,9 @@ Pede na especificação:
 * verificar se o código usa react e se usa as tecnologias em aula, os códigos do sor, etc
 * ver se a cota de tabelas + relacionamentos no bd foi atingida (6-8 tabelas, 2 cadastros simples, 1 cadastro 1 ..n, 2 cadastros n..n)
 * Deve possuir um botão de compra que manda para a tela do carrinho;
-* Implementar duas telas de listagens públicas (vitrine brechó que lista todas as peças cadastradas + falta outra)
+* Implementar duas telas de listagens públicas (vitrine brechó que lista todas as peças cadastradas + falta outra) - garantir que a proposta não seja mais pública visto que o cliente vai ter login. não precisa mais de token.
 * Hospedar Locaweb 
+* implementar envio de email
 ----------------------------------------------------------------------
 
 Fazendo:

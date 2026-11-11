@@ -1,18 +1,18 @@
 <?php
 class PecaModel {
-    private $conn;
+    private $pdo; 
 
-    public function __construct($conexao) {
-        $this->conn = $conexao;
+    public function __construct($pdo) {
+        $this->pdo = $pdo; 
     }
 
     public function listarCategorias() {
-        $stmt = $this->conn->query("SELECT * FROM categorias ORDER BY nome ASC");
+        $stmt = $this->pdo->query("SELECT * FROM categorias ORDER BY nome ASC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function adicionarPeca($lote_id, $categoria_id, $descricao, $marca, $tamanho, $cor, $estado, $observacoes, $foto_caminho) {
-        $stmt = $this->conn->prepare("
+        $stmt = $this->pdo->prepare("
             INSERT INTO pecas 
             (lote_id, categoria_id, descricao, marca, tamanho, cor, estado, observacoes, foto_caminho) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -23,7 +23,7 @@ class PecaModel {
     }
 
     public function buscarPecasPorLote($lote_id) {
-        $stmt = $this->conn->prepare("
+        $stmt = $this->pdo->prepare("
             SELECT p.*, cat.nome as categoria_nome 
             FROM pecas p 
             JOIN categorias cat ON p.categoria_id = cat.id 
@@ -34,7 +34,7 @@ class PecaModel {
     }
 
     public function avaliarPeca($peca_id, $lote_id, $status_avaliacao, $valor_proposto) {
-        $stmt = $this->conn->prepare("
+        $stmt = $this->pdo->prepare("
             UPDATE pecas 
             SET status_avaliacao = ?, valor_proposto = ? 
             WHERE id = ? AND lote_id = ?
@@ -43,7 +43,7 @@ class PecaModel {
     }
 
     public function buscarPecaPorId($id) {
-        $stmt = $this->conn->prepare("
+        $stmt = $this->pdo->prepare("
             SELECT p.*, cat.nome as categoria_nome 
             FROM pecas p 
             JOIN categorias cat ON p.categoria_id = cat.id 
@@ -54,12 +54,11 @@ class PecaModel {
     }
 
     public function listarTodasPecasPublicas() {
-        $stmt = $this->conn->query("
-            SELECT p.*, cat.nome as categoria_nome 
+        $stmt = $this->pdo->query("
+            SELECT p.*, l.status as lote_status 
             FROM pecas p 
-            JOIN categorias cat ON p.categoria_id = cat.id 
-            WHERE p.status_avaliacao = 1 
-            ORDER BY p.id DESC
+            JOIN lotes l ON p.lote_id = l.id 
+            WHERE l.status = 3 AND p.status_avaliacao = 1
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
