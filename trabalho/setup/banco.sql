@@ -52,6 +52,12 @@ CREATE TABLE pecas (
     lote_id INT NOT NULL,
     categoria_id INT NOT NULL,
     descricao VARCHAR(255) NULL,
+    foto_caminho VARCHAR(255) NULL,
+    tamanho VARCHAR(30) NULL,
+    cor VARCHAR(50) NULL,
+    marca VARCHAR(100) NULL,
+    estado VARCHAR(100) NULL,
+    observacoes TEXT NULL,
     status_avaliacao INT DEFAULT 0,
     valor_proposto DECIMAL(10,2) NULL,
     FOREIGN KEY (lote_id) REFERENCES lotes(id) ON DELETE CASCADE,
@@ -82,9 +88,3 @@ INSERT INTO categorias (nome) VALUES
 
 INSERT INTO tags (nome) VALUES 
 ('Sem Avarias'), ('Sem Etiqueta'), ('Com Pequeno Desgaste'), ('Marca Famosa'), ('Peça Vintage');
-
-INSERT INTO usuarios (cpf, nome, email, senha, telefone, tipo) VALUES 
-('000.000.000-00', 'Administrador Brechó', '2025000434@aluno.canoas.ifrs.edu.br', '$2y$10$eE.l9XQ4jJ4dJjM5Bq7I.e123456789012345678901234567890', '11999999999', 'admin');
-
-INSERT INTO usuarios (cpf, nome, email, senha, telefone, chave_pix, saldo_credito) VALUES 
-('111.111.111-11', 'Maria Oliveira', 'cliente@email.com', '$2y$10$eE.l9XQ4jJ4dJjM5Bq7I.e123456789012345678901234567890', '11988888888', 'maria@pix.com', 0.00);

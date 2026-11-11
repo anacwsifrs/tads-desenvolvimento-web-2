@@ -1,0 +1,34 @@
+O que será cobrado (LEIA ITEM POR ITEM AGORA E ANTES DE SUBMETER!):
+
+HTML e CSS: a biblioteca Bootstrap e templates prontos de front-end  (HTML e CSS) poderão ser utilizados; não avaliarei aparência, usabilidade, acessibilidade ou responsividade, isso ficou em Web 1.
+OBRIGATÓRIO: Entrega via github ou gitlab
+PODE usar o trabalho de Web 1 como base para o HTML e CSS.
+NÃO PODE usar códigos prontos (sejam templates ou frameworks) de lojas e afins.
+NÃO PODE usar frameworks ou bibliotecas PHP foras da vista em aula, devem ser usadas as linguagens "cruas" como foram vistas na disciplina, pelo menos em uma página.
+Deve ter um BD com usuários, produtos, etc... (com SGBD MySQL) (envie o .sql exportado do PHPMyAdmin). Entre 6 e 8 tabelas é o suficiente.
+Telas:
+Principal: Sistema de login (1), com recuperação de senha (2) e cadastro de foto (3) do usuario salvando em arquivo 
+Tela de cadastro de usuário, com validação de campos (HTML e/ou JS) e no backend também;
+Tela de termos de serviço e política de plágio (muito importante para regras de LGPD)
+Fale conosco (formulário de contato), com validação de campos (HTML e/ou JS). Deve enviar e-mail via PHP;
+Todas as telas devem conter uma tag meta plagiarism
+Tela específica para detalhar apenas 1 produto, um serviço uma redação  clicado (deve funcionar para todos os recursos um get one dinamicamente, apenas 1 PHP para todos). Deve possuir um botão de compra que manda para a tela do carrinho;
+Ao menos deve ter:
+2 cadastros simples
+1 cadastro 1 ..n
+2 cadastros n..n
+2 telas de listagem públicas
+Validação de dados ou algum recurso consumindo uma LLM (Gemini é de grátis)
+É recomendado ter um arquivo PHP separado só para conexão com o banco e dar include dele em todas as outras páginas que acessam BD.
+Também pode fazer um arquivo PHP de cabeçalho e um de rodapé e incluir em todas as páginas para não se repetir. 
+Isso dá algo entre 5 e 10 arquivos PHP +-.
+AJAX e SPA pelo menos em um recurso
+O sistema deve estar hospedado ou no servidor que o professor liberar ou outro
+O sistema deverá ser entregue até o dia 26/06/2025. Deve ser feito individualmente.
+
+O sistema deverá ser enviado aqui no Moodle e TAMBÉM hospedado (recomendo usar a Locaweb fornecido em aula), você pode tentar um Heroku, Render da vida também, mas não garanto nada.
+
+Não se esqueça de incluir o SQL do banco entre os arquivos upados. Ele pode ser obtido no PHPMyAdmin através do item 'Export' do menu.
+Envie o endereço do site nos comentários do envio ou em um arquivo txt.
+Mande tudo em 1 zip aqui no Moodle. O tamanho máximo de envio é de 20MB. Se o seu tem mais que isso, tem algum problema sério. Não aceitarei arquivos enviados por outros meios.
+TRABALHO INDIVIDUAL. Cópias totais ou parciais de colegas ou conteúdo encontrado na Web (inclusive IA) = ZERO. Com saberei que não fizeram tudo com IA vocês vão ter que me explicar os seus códigos então caprichem e aprendam. 
