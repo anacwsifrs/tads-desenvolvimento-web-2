@@ -220,16 +220,31 @@ class LoteController {
         }
 
         $data = json_decode(file_get_contents('php://input'), true);
-        $descricaoPeca = $data['descricao'] ?? '';
+        
+        $categoria   = $data['categoria'] ?? 'Não especificada';
+        $marca       = $data['marca'] ?? 'Não informada';
+        $tamanho     = $data['tamanho'] ?? 'Não informado';
+        $cor         = $data['cor'] ?? 'Não informada';
+        $estado      = $data['estado'] ?? 'Usado';
+        $descricao   = $data['descricao'] ?? '';
+        $observacoes = $data['observacoes'] ?? '';
 
-        if (empty($descricaoPeca)) {
-            echo json_encode(['erro' => 'Descrição não informada.']);
+        if (empty($descricao) && empty($categoria)) {
+            echo json_encode(['erro' => 'Informações da peça insuficientes.']);
             exit;
         }
 
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=" . $apiKey;
 
-        $prompt = "Você é um avaliador especialista em brechós de moda. Analise a seguinte peça: '$descricaoPeca'. Sugira um valor em Reais (R$) para compra no brechó e faça um comentário curto sobre o apelo comercial dela. Responda em texto simples e conciso.";
+        $prompt = "Você é um especialista em precificação de roupas em brechó. Analise os detalhes desta peça:\n" .
+                  "- Categoria: {$categoria}\n" .
+                  "- Marca: {$marca}\n" .
+                  "- Tamanho: {$tamanho}\n" .
+                  "- Cor: {$cor}\n" .
+                  "- Estado de Conservação: {$estado}\n" .
+                  "- Descrição: {$descricao}\n" .
+                  "- Observações de Triagem: {$observacoes}\n\n" .
+                  "Com base nesses atributos, sugira um valor justo em Reais (R$) para compra no brechó e faça um comentário curto sobre o apelo comercial dela. Responda em texto simples e conciso.";
 
         $payload = [
             "contents" => [

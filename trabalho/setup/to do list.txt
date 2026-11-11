@@ -13,8 +13,6 @@ Pede na especificação:
 ----------------------------------------------------------------------
 
 Fazendo:
-* Tela específica para detalhar apenas 1 peça clicado (deve funcionar para todos os recursos um get one dinamicamente, apenas 1 PHP para todos). (Ver se tem isso + talvez melhorar a peça com upload de foto para a vitrine, display da peça + foto e ao clicar no getOne dá pra ver. dá pra melhorar a entidade peça para guardar tamanho + cor + marca + estado da peça + observações)
-2. Formulário e Upload: Atualize o formulário de cadastro com os novos campos. Não esqueça de adicionar enctype="multipart/form-data" na tag <form> para que o PHP consiga receber a imagem e salvá-la no servidor usando move_uploaded_file().
 3. O "Get One" Dinâmico (Requisito): Crie um único arquivo, como detalhe.php. Na sua vitrine, o link de cada peça apontará para ele passando o ID na URL (ex: detalhe.php?id=12). Esse arquivo vai capturar o $_GET['id'], buscar a peça no banco (SELECT * FROM pecas WHERE id = ?) e exibir os dados e a foto.
 4. Gemini Turbinado: No seu api_gemini.php, você concatenará essas novas informações no prompt enviado ao Google. Exemplo: "Sugira um preço para a seguinte peça: Categoria: Camisa, Marca: Zara, Tamanho: M, Cor: Azul, Estado: Usada (bom estado)."
 
@@ -28,6 +26,7 @@ Feito:
 * Tenho AJAX em views/cadastrar.php: quando você digita o CPF, se o cliente já existe, o nome, e-mail, telefone e chave PIX do cliente são preenchidos automaticamente na tela sem dar refresh.
 * Tenho SPA na tela de perfil
 * Integração com Gemini API
+* Tela específica para detalhar apenas 1 peça clicado (deve funcionar para todos os recursos um get one dinamicamente, apenas 1 PHP para todos).
 
 ----------------------------------------------------------------------
 
