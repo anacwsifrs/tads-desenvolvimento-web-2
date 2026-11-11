@@ -23,8 +23,8 @@
     <header>
         <h1><a href="index.php" style="color:white; text-decoration:none;">🛍️ Brechó EcoModa</a></h1>
         <nav>
-            <a href="index.php?acao=vitrine">Início</a>
-            <a href="index.php?acao=vitrine">Vitrine Pública</a>
+            <a href="index.php?acao=inicio">Início</a>
+            <a href="index.php?acao=vitrine">Vitrine</a>
             <a href="index.php?acao=fale_conosco">Fale Conosco</a>
             <a href="index.php?acao=termos">Termos e LGPD</a>
             

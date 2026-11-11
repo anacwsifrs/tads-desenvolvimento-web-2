@@ -32,6 +32,10 @@ switch ($acao) {
             require_once "views/public/cadastro.php";
         }
         break;
+    
+    case 'inicio':
+        require_once "views/public/inicio.php";
+        break;
 
     case 'vitrine':
     case 'detalhar':

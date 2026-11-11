@@ -3,21 +3,15 @@ Frescura:
 * combinar abas início e vitrine pública já que fazem a mesma coisa
 * botão olhinho pra senha
 * alerta antes de logout
+* melhorar texto da tela de inicio
+* mudar nome brechó ecomoda
 
 Pede na especificação:
 * melhorar/unificar css + usar react em alguma coisa + verificar se o código usa react e se usa as tecnologias em aula, os códigos do sor, etc
 * ver se a cota de tabelas + relacionamentos no bd foi atingida (6-8 tabelas, 2 cadastros simples, 1 cadastro 1 ..n, 2 cadastros n..n). aproveitar para revisar se as tabelas que temos fazem sentido.
-* duas telas públicas: vitrine + Mural de Doações (instituições que recebem doações + explicando como o processo funciona)
-* Deve possuir um botão de compra que manda para a tela do carrinho; talvez implementar lógica de interessados, mas daí tem que estar logado.
+* Deve possuir um botão de compra que manda para a tela do carrinho;
 * Hospedar Locaweb 
 * implementar envio de email
-----------------------------------------------------------------------
-
-Fazendo: deixando a tela de proposta não mais pública já que agora o usuário tem conta
-No menu do cliente (meus_lotes.php), ao clicar em "Ver Proposta", o link passará a ser:index.php?acao=proposta&id=X (em vez de token=...).
-O LoteController vai verificar se o usuário está logado e se o lote pertence a ele (ou se é um admin). Se não for, redireciona ou nega o acesso.
-Removemos a necessidade da coluna token no fluxo principal.
-Colocar o arquivo proposta.php na pasta cliente
 
 ----------------------------------------------------------------------
 
@@ -30,6 +24,7 @@ Feito:
 * Tenho SPA na tela de perfil
 * Integração com Gemini API
 * Tela específica para detalhar apenas 1 peça clicado (deve funcionar para todos os recursos um get one dinamicamente, apenas 1 PHP para todos).
+* 2 telas de listagem públicas (início e vitrine)
 
 ----------------------------------------------------------------------
 
