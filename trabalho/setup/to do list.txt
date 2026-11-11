@@ -8,6 +8,7 @@ Frescura:
 * atualizar lgpd por causa do pix
 * notificacoes
 * logs
+* já avaliei o lote e ao clicar nele de novo é como se nao tivesse avaliado
 
 Pede na especificação:
 * melhorar/unificar css + usar react em alguma coisa + verificar se o código usa react e se usa as tecnologias em aula, os códigos do sor, etc
