@@ -41,7 +41,6 @@ export default function RecuperarSenha() {
   return (
     <div className="max-w-md mx-auto my-8">
       <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
-        {/* Cabeçalho */}
         <div className="bg-stone-800 text-white p-6 text-center">
           <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center mx-auto mb-3 shadow">
             <KeyRound size={24} className="text-stone-900" />

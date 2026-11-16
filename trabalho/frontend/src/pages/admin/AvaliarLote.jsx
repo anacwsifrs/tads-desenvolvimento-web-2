@@ -25,7 +25,7 @@ export default function AvaliarLote() {
   const [salvando, setSalvando] = useState(false);
   const [memoriaIA, setMemoriaIA] = useState({});
   const [carregandoIA, setCarregandoIA] = useState({});
-  const [popoverAberto, setPopoverAberto] = useState(null);
+  const [pecaPopover, setPecaPopover] = useState(null);
 
   useEffect(() => {
     const carregarLote = async () => {
@@ -56,8 +56,10 @@ export default function AvaliarLote() {
     if (id) carregarLote();
   }, [id]);
 
+  const bloqueado = lote ? Number(lote.status) >= 3 : false;
+
   const definirDecisaoPeca = (pecaId, novoStatus) => {
-    if (lote && Number(lote.status) >= 3) return;
+    if (bloqueado) return;
     setAvaliacoes((prev) => ({
       ...prev,
       [pecaId]: {
@@ -68,7 +70,7 @@ export default function AvaliarLote() {
   };
 
   const alterarValorPeca = (pecaId, novoValor) => {
-    if (lote && Number(lote.status) >= 3) return;
+    if (bloqueado) return;
     setAvaliacoes((prev) => ({
       ...prev,
       [pecaId]: {
@@ -88,13 +90,15 @@ export default function AvaliarLote() {
   };
 
   const handleCliqueIA = async (peca) => {
-    if (popoverAberto === peca.id) {
-      setPopoverAberto(null);
+    if (bloqueado) return;
+
+    if (pecaPopover?.id === peca.id) {
+      setPecaPopover(null);
       return;
     }
 
     if (memoriaIA[peca.id]) {
-      setPopoverAberto(peca.id);
+      setPecaPopover(peca);
       return;
     }
 
@@ -126,19 +130,18 @@ export default function AvaliarLote() {
         textoResultado = `Erro: ${data.erro || data.error.message || 'Erro inesperado ao consultar a IA.'}`;
       } else if (data.candidates && data.candidates.length > 0) {
         textoResultado = data.candidates[0].content.parts[0].text;
-        setMemoriaIA((prev) => ({ ...prev, [peca.id]: textoResultado }));
       } else {
         textoResultado = 'A IA não retornou sugestões para esta peça.';
       }
 
       setMemoriaIA((prev) => ({ ...prev, [peca.id]: textoResultado }));
-      setPopoverAberto(peca.id);
+      setPecaPopover(peca);
     } catch (error) {
       setMemoriaIA((prev) => ({
         ...prev,
         [peca.id]: 'Erro de comunicação com o servidor. Tente novamente.'
       }));
-      setPopoverAberto(peca.id);
+      setPecaPopover(peca);
     } finally {
       setCarregandoIA((prev) => ({ ...prev, [peca.id]: false }));
     }
@@ -146,6 +149,7 @@ export default function AvaliarLote() {
 
   const handleSalvarAvaliacao = async (e) => {
     e.preventDefault();
+    if (bloqueado) return;
 
     const pendentes = Object.values(avaliacoes).some((item) => item.status === 0);
     if (pendentes) {
@@ -207,7 +211,6 @@ export default function AvaliarLote() {
     );
   }
 
-  const bloqueado = Number(lote.status) >= 3;
   const totalProposta = calcularTotal();
 
   return (
@@ -245,12 +248,12 @@ export default function AvaliarLote() {
       </div>
 
       <form onSubmit={handleSalvarAvaliacao} className="space-y-6">
-        <div className="bg-white border border-stone-200 rounded-xl shadow-sm overflow-visible">
-          <div className="p-5 border-b border-stone-200 bg-stone-50 rounded-t-xl">
+        <div className="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="p-5 border-b border-stone-200 bg-stone-50">
             <h3 className="font-bold text-stone-800 text-lg">Avaliar Peças Cadastradas</h3>
           </div>
 
-          <div className="overflow-x-auto overflow-y-visible">
+          <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-stone-100 border-b border-stone-200 text-xs uppercase text-stone-600 font-bold">
@@ -343,7 +346,7 @@ export default function AvaliarLote() {
                       </td>
 
                       <td className="p-4">
-                        <div className="flex items-center gap-2 relative">
+                        <div className="flex items-center gap-2">
                           {av.status === 1 ? (
                             <input
                               type="number"
@@ -354,7 +357,7 @@ export default function AvaliarLote() {
                               placeholder="0.00"
                               value={av.valor}
                               onChange={(e) => alterarValorPeca(peca.id, e.target.value)}
-                              className="w-28 p-2 bg-white border border-stone-300 rounded-lg text-sm font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                              className="w-28 p-2 bg-white border border-stone-300 rounded-lg text-sm font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 read-only:bg-stone-100 read-only:text-stone-600"
                             />
                           ) : (
                             <span className="w-28 text-xs font-semibold text-stone-400">
@@ -362,41 +365,23 @@ export default function AvaliarLote() {
                             </span>
                           )}
 
-                          <div className="relative">
-                            <button
-                              type="button"
-                              onClick={() => handleCliqueIA(peca)}
-                              disabled={carregandoIA[peca.id]}
-                              title="Sugestão de Preço com IA (Gemini)"
-                              className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white flex items-center justify-center shadow-sm transition transform hover:scale-105 disabled:opacity-70"
-                            >
-                              {carregandoIA[peca.id] ? (
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                              ) : (
-                                <Sparkles size={16} />
-                              )}
-                            </button>
-
-                            {popoverAberto === peca.id && (
-                              <div className="absolute right-0 top-11 w-72 bg-white border border-purple-300 rounded-xl shadow-xl p-3.5 z-50 text-left">
-                                <div className="flex justify-between items-center border-b border-stone-100 pb-2 mb-2">
-                                  <span className="text-xs font-bold text-purple-700 flex items-center gap-1">
-                                    <Sparkles size={14} /> Sugestão da IA
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => setPopoverAberto(null)}
-                                    className="text-stone-400 hover:text-red-500 font-bold text-sm"
-                                  >
-                                    ✕
-                                  </button>
-                                </div>
-                                <div className="text-xs text-stone-700 leading-relaxed max-h-48 overflow-y-auto whitespace-pre-line">
-                                  {memoriaIA[peca.id]}
-                                </div>
-                              </div>
+                          <button
+                            type="button"
+                            onClick={() => handleCliqueIA(peca)}
+                            disabled={bloqueado || carregandoIA[peca.id]}
+                            title={
+                              bloqueado
+                                ? 'Avaliação já concluída'
+                                : 'Sugestão de Preço com IA (Gemini)'
+                            }
+                            className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white flex items-center justify-center shadow-sm transition transform hover:scale-105 disabled:opacity-45 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          >
+                            {carregandoIA[peca.id] ? (
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                              <Sparkles size={16} />
                             )}
-                          </div>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -406,7 +391,7 @@ export default function AvaliarLote() {
             </table>
           </div>
 
-          <div className="p-5 bg-stone-100 border-t border-stone-200 flex justify-end items-center gap-3 rounded-b-xl">
+          <div className="p-5 bg-stone-100 border-t border-stone-200 flex justify-end items-center gap-3">
             <span className="text-base font-bold text-stone-700">Valor Total da Proposta:</span>
             <span className="text-2xl font-black text-emerald-600">
               {totalProposta.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
@@ -446,6 +431,51 @@ export default function AvaliarLote() {
           </div>
         )}
       </form>
+
+      {pecaPopover && (
+        <div
+          className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[1px] flex items-center justify-center p-4"
+          onClick={() => setPecaPopover(null)}
+        >
+          <div
+            className="bg-white border border-purple-200 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-gradient-to-r from-purple-700 to-indigo-700 text-white px-5 py-3.5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles size={18} />
+                <div>
+                  <h4 className="font-bold text-sm leading-tight">Sugestão de Preço da IA</h4>
+                  <p className="text-[11px] text-purple-200 line-clamp-1">
+                    {pecaPopover.categoria_nome} • {pecaPopover.descricao}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPecaPopover(null)}
+                className="p-1 rounded-lg text-purple-200 hover:text-white hover:bg-white/10 transition"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="p-5 max-h-[60vh] overflow-y-auto text-sm text-stone-700 leading-relaxed whitespace-pre-line">
+              {memoriaIA[pecaPopover.id]}
+            </div>
+
+            <div className="bg-stone-50 border-t border-stone-200 px-5 py-3 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setPecaPopover(null)}
+                className="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg transition"
+              >
+                Entendi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

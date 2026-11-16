@@ -2,19 +2,22 @@
 require_once 'models/PedidoModel.php';
 require_once 'models/PecaModel.php';
 require_once 'models/UsuarioModel.php';
+require_once 'models/LogModel.php';
 
 class PedidoController {
     private $pedidoModel;
     private $pecaModel;
     private $usuarioModel;
+    private $logModel;
 
     public function __construct($pdo) {
         $this->pedidoModel = new PedidoModel($pdo);
         $this->pecaModel = new PecaModel($pdo);
         $this->usuarioModel = new UsuarioModel($pdo);
+        $this->logModel = new LogModel($pdo);
     }
 
-   public function carrinho() {
+    public function carrinho() {
         $this->verificarLogin();
         @ob_clean();
         header('Content-Type: application/json');
@@ -92,6 +95,7 @@ class PedidoController {
         $itens = $_SESSION['carrinho'];
         $valor_total_pedido = array_sum(array_column($itens, 'preco_venda'));
         $valor_final_a_pagar = $valor_total_pedido;
+        $novo_saldo = null;
 
         if ($usar_saldo) {
             $cliente = $this->usuarioModel->buscarClientePorId($cliente_id);
@@ -120,19 +124,26 @@ class PedidoController {
         $pedido_id = $this->pedidoModel->criarPedido($cliente_id, $valor_final_a_pagar, $itens);
 
         if ($pedido_id) {
-            if ($valor_final_a_pagar == 0) {
-                $this->pedidoModel->atualizarStatus($pedido_id, 'Aprovado');
-            }
             $_SESSION['carrinho'] = [];
 
+            $qtdItens = count($itens);
+            $valorFormatado = number_format((float)$valor_final_a_pagar, 2, ',', '.');
+            $forma = ($valor_final_a_pagar == 0) ? 'Saldo integral' : "PIX pendente (R$ {$valorFormatado})";
+            $this->logModel->registrar(
+                $cliente_id,
+                'NOVA_COMPRA',
+                "Pedido #PED-{$pedido_id} criado com {$qtdItens} peça(s) — {$forma}."
+            );
+
             $mensagem = ($valor_final_a_pagar == 0)
-                ? 'Pedido gerado e pago integralmente com seu saldo! Peças reservadas.'
-                : 'Pedido gerado! Valor pendente: R$ ' . number_format($valor_final_a_pagar, 2, ',', '.') . '. Efetue o PIX e anexe o comprovante.';
+                ? 'Pedido gerado e abatido do seu saldo! Aguarde a aprovação do administrador para retirada.'
+                : 'Pedido gerado! Valor pendente: R$ ' . $valorFormatado . '. Efetue o PIX e anexe o comprovante.';
 
             echo json_encode([
                 'sucesso' => true,
                 'mensagem' => $mensagem,
-                'pedido_id' => $pedido_id
+                'pedido_id' => $pedido_id,
+                'novo_saldo' => $novo_saldo
             ]);
         } else {
             http_response_code(500);
@@ -146,6 +157,30 @@ class PedidoController {
         @ob_clean();
         header('Content-Type: application/json');
         echo json_encode($this->pedidoModel->listarPedidosCliente($_SESSION['usuario_id']));
+        exit;
+    }
+
+    public function detalhar_pedido() {
+        $this->verificarLogin();
+        @ob_clean();
+        header('Content-Type: application/json');
+
+        $pedido_id = $_GET['id'] ?? 0;
+        $pedido = $this->pedidoModel->buscarPedidoComItens($pedido_id);
+
+        if (!$pedido) {
+            http_response_code(404);
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Pedido não encontrado.']);
+            exit;
+        }
+
+        if ($_SESSION['usuario_tipo'] !== 'admin' && $_SESSION['usuario_id'] != $pedido['cliente_id']) {
+            http_response_code(403);
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Acesso não autorizado a este pedido.']);
+            exit;
+        }
+
+        echo json_encode($pedido);
         exit;
     }
 
@@ -168,6 +203,13 @@ class PedidoController {
             if (move_uploaded_file($_FILES['comprovante']['tmp_name'], $diretorio . $nome_arquivo)) {
                 $caminho_bd = 'comprovantes_pix/' . $nome_arquivo;
                 $this->pedidoModel->salvarComprovantePix($pedido_id, $caminho_bd);
+
+                $this->logModel->registrar(
+                    $_SESSION['usuario_id'],
+                    'COMPROVANTE_PIX_PEDIDO',
+                    "Cliente anexou comprovante PIX ao pedido #PED-{$pedido_id}."
+                );
+
                 echo json_encode([
                     'sucesso' => true,
                     'mensagem' => 'Comprovante enviado com sucesso!',
@@ -196,6 +238,7 @@ class PedidoController {
         header('Content-Type: application/json');
         $pedido_id = $_GET['id'] ?? 0;
         $this->pedidoModel->atualizarStatus($pedido_id, 'Aprovado');
+        $this->logModel->registrar($_SESSION['usuario_id'], 'APROVAR_PEDIDO', "Admin aprovou o pedido #PED-{$pedido_id}.");
         echo json_encode(['sucesso' => true, 'mensagem' => 'Pedido aprovado com sucesso!']);
         exit;
     }
@@ -206,6 +249,7 @@ class PedidoController {
         header('Content-Type: application/json');
         $pedido_id = $_GET['id'] ?? 0;
         $this->pedidoModel->cancelarPedidoERestaurarPecas($pedido_id);
+        $this->logModel->registrar($_SESSION['usuario_id'], 'CANCELAR_PEDIDO', "Admin cancelou o pedido #PED-{$pedido_id} e devolveu as peças à vitrine.");
         echo json_encode(['sucesso' => true, 'mensagem' => 'Pedido cancelado e peças devolvidas à vitrine!']);
         exit;
     }

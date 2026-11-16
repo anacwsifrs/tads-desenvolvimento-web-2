@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS brecho_db;
 USE brecho_db;
 
+DROP TABLE IF EXISTS logs;
 DROP TABLE IF EXISTS pedido_itens;
 DROP TABLE IF EXISTS pedidos;
 DROP TABLE IF EXISTS lote_tag;
@@ -102,13 +103,53 @@ CREATE TABLE pedido_itens (
     FOREIGN KEY (peca_id) REFERENCES pecas(id) ON DELETE RESTRICT
 );
 
+CREATE TABLE logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NULL,
+    acao VARCHAR(80) NOT NULL,
+    descricao TEXT NOT NULL,
+    ip VARCHAR(45) NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+);
+
 INSERT INTO usuarios (cpf, nome, email, senha, telefone, tipo) VALUES 
 ('000.000.000-00', 'Administrador Brechó', 'intent.brecho.contato@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(51) 99999-9999', 'admin');
 
 INSERT INTO categorias (nome) VALUES 
-('Camisa'), ('Camiseta'), ('Regata'), ('Jaqueta'), 
-('Calça Jeans'), ('Bermuda'), ('Vestido'), ('Saia'), 
-('Blusa de Frio'), ('Tênis'), ('Bota'), ('Bolsa');
+('Camisa Social'),
+('Camiseta / T-Shirt'),
+('Blusa / Cropped'),
+('Regata'),
+('Moletom / Tricô'),
+('Jaqueta / Corta-Vento'),
+('Blazer / Sobretudo'),
+('Calça Jeans'),
+('Calça Alfaiataria / Sarja'),
+('Shorts / Bermuda'),
+('Saia'),
+('Vestido Curto / Midi'),
+('Vestido Longo'),
+('Macacão / Macaquinho'),
+('Tênis'),
+('Bota / Coturno'),
+('Sandália / Rasteirinha'),
+('Sapato Social'),
+('Sapatilha'),
+('Bolsa / Mochila'),
+('Cinto / Lenço'),
+('Moda Íntima / Praia'),
+('Acessórios / Bijuterias'),
+('Outros');
 
 INSERT INTO tags (nome) VALUES 
-('Sem Avarias'), ('Sem Etiqueta'), ('Com Pequeno Desgaste'), ('Marca Famosa'), ('Peça Vintage');
+('Novo com Etiqueta'),
+('Impecável / Seminovo'),
+('Higienizado & Passado'),
+('Marca Premium / Grife'),
+('Vintage / Retrô'),
+('Peça Coringa / Básica'),
+('Tecido Nobre (Linho/Seda/Couro)'),
+('Alfaiataria Estruturada'),
+('Pequeno Desgaste de Uso'),
+('Falta Botão / Zíper');

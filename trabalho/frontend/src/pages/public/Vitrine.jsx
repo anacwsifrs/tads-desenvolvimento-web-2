@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Eye, Shirt, Tag } from 'lucide-react';
+import { Search, ShoppingCart, Eye, Shirt, Tag, Store } from 'lucide-react';
 
 const API_URL = 'http://localhost/brecho/index.php';
 const UPLOADS_URL = 'http://localhost/brecho/uploads/';
@@ -76,9 +76,12 @@ export default function Vitrine() {
 
   return (
     <div className="space-y-6 pb-8">
-      <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200 pb-5">
         <div>
-          <h2 className="text-2xl font-black text-stone-800">Vitrine de Peças Disponíveis</h2>
+          <h2 className="text-2xl font-black text-stone-800 flex items-center gap-2">
+            <Store className="text-emerald-600" size={26} />
+            <span>Vitrine de Peças Disponíveis</span>
+          </h2>
           <p className="text-stone-500 text-sm mt-1">
             Confira os itens selecionados e higienizados prontos para compra presencial ou reserva.
           </p>
@@ -92,14 +95,14 @@ export default function Vitrine() {
               placeholder="Buscar peça, marca..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-stone-50 border border-stone-300 rounded-lg text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-56"
+              className="pl-9 pr-4 py-2 bg-white border border-stone-300 rounded-lg text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-56 shadow-xs"
             />
           </div>
 
           <select
             value={categoriaFiltro}
             onChange={(e) => setCategoriaFiltro(e.target.value)}
-            className="px-3 py-2 bg-stone-50 border border-stone-300 rounded-lg text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="px-3 py-2 bg-white border border-stone-300 rounded-lg text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xs"
           >
             <option value="">Todas as categorias</option>
             {categoriasDisponiveis.map((cat) => (
@@ -114,7 +117,7 @@ export default function Vitrine() {
           <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : pecasFiltradas.length === 0 ? (
-        <div className="bg-white border border-stone-200 rounded-xl p-12 text-center text-stone-500">
+        <div className="bg-white border border-stone-200 rounded-xl p-12 text-center text-stone-500 shadow-sm">
           <Shirt size={48} className="mx-auto mb-3 text-stone-300" />
           <p className="font-semibold text-lg text-stone-700">Nenhuma peça encontrada na vitrine no momento.</p>
           <p className="text-sm mt-1">Tente limpar os filtros ou volte em breve para conferir novidades.</p>

@@ -26,6 +26,7 @@ import EditarLote from './pages/admin/EditarLote';
 import Clientes from './pages/admin/Clientes';
 import FormClienteAdmin from './pages/admin/FormClienteAdmin';
 import GerenciarPedidos from './pages/admin/GerenciarPedidos';
+import Logs from './pages/admin/Logs';
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
           <Route path="admin/clientes/ver/:id" element={<FormClienteAdmin readonly={true} />} />
           <Route path="admin/clientes/editar/:id" element={<FormClienteAdmin readonly={false} />} />
           <Route path="admin/pedidos" element={<GerenciarPedidos />} />
+          <Route path="admin/logs" element={<Logs />} />
         </Route>
       </Routes>
     </BrowserRouter>

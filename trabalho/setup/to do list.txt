@@ -1,17 +1,4 @@
 Frescura:
-* melhorar as categorias pré-cadastradas em lote
-
-* melhorar texto da tela de inicio
-* getOne das compras pra ver as peças compradas
-* mesmo se a compra foi feita pelo saldo o admin tem que aprovar ou não, ela não pode ir direto para aprovado 
-* falta padrão de css:
-    - porque a vitrine, meu perfil, meu carrinho, meus lotes, minhas compras tem a header em uma div separada do conteúdo da página? 
-        - sobre isso, as telas de avaliação de lote por exemplo trazem um padrão mais bonito
-    - porque o fale conosco e o termos e lgpd e login e cadastro tem o header preto diferente do resto das telas? 
-        - a tela de termos o card dela é maior que os outros, e ao navegar entre telas isso distoa bastante, ela tem scroll vertical só porque a informação ocupa mais especificação
-* ainda dá pra clciar no botão de sugestão da ia mesmo se a avaliação já foi concluída. e a avaliação deveria sobrepor à tela. do jeito atual ela aumenta a div de avaliar peças cadastradas, criando um scroll vertical feio
-* eu não gosto da ux da tela de início. pode ser criativo e reestruturar 100%
-
 * notificacoes
 * logs
 * implementar envio de email

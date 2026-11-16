@@ -19,6 +19,7 @@ require_once 'controllers/PecaController.php';
 require_once 'controllers/UsuarioController.php';
 require_once 'controllers/ContatoController.php';
 require_once 'controllers/PedidoController.php';
+require_once 'controllers/LogController.php';
 
 $acao = $_GET['acao'] ?? 'vitrine';
 
@@ -71,6 +72,7 @@ switch ($acao) {
     case 'remover_carrinho':
     case 'finalizar_compra':
     case 'meus_pedidos': 
+    case 'detalhar_pedido':
     case 'upload_comprovante_pix':
     case 'gerenciar_pedidos': 
     case 'aprovar_pedido':
@@ -81,6 +83,11 @@ switch ($acao) {
 
     case 'fale_conosco':
         $controller = new ContatoController($pdo);
+        $controller->$acao();
+        break;
+
+    case 'listar_logs':
+        $controller = new LogController($pdo);
         $controller->$acao();
         break;
 

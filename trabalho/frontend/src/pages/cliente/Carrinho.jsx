@@ -68,9 +68,9 @@ export default function Carrinho() {
 
       if (resposta.ok && dados.sucesso) {
         if (dados.novo_saldo !== null) {
-          const userLocal = JSON.parse(localStorage.getItem('usuario') || '{}');
+          const userLocal = JSON.parse(localStorage.getItem('brecho_usuario') || '{}');
           localStorage.setItem(
-            'usuario',
+            'brecho_usuario',
             JSON.stringify({ ...userLocal, saldo_credito: dados.novo_saldo })
           );
           window.dispatchEvent(new Event('usuarioAtualizado'));
@@ -99,12 +99,15 @@ export default function Carrinho() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-8">
-      <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+    <div className="space-y-6 pb-8">
+      <div className="border-b border-stone-200 pb-5">
         <h2 className="text-2xl font-black text-stone-800 flex items-center gap-2">
           <ShoppingCart className="text-emerald-600" size={26} />
           <span>Meu Carrinho de Compras</span>
         </h2>
+        <p className="text-stone-500 text-sm mt-1">
+          Revise as peças selecionadas, aplique seu saldo de crédito e conclua a reserva.
+        </p>
       </div>
 
       {itens.length === 0 ? (
@@ -112,7 +115,7 @@ export default function Carrinho() {
           <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto text-stone-400">
             <ShoppingCart size={32} />
           </div>
-          <h3 className="text-xl font-bold text-stone-700">Seu carrinho está vazio! 🛍️</h3>
+          <h3 className="text-xl font-bold text-stone-700">Seu carrinho está vazio!</h3>
           <p className="text-stone-500 text-sm">
             Explore peças exclusivas selecionadas na nossa vitrine.
           </p>
@@ -132,7 +135,7 @@ export default function Carrinho() {
                 <tr className="bg-stone-100 border-b border-stone-200 text-xs uppercase text-stone-600 font-bold">
                   <th className="p-4">Peça</th>
                   <th className="p-4">Valor Venda</th>
-                  <th className="p-4 w-24 text-center">Ação</th>
+                  <th className="p-4 w-28 text-center">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200 text-sm">
@@ -188,44 +191,48 @@ export default function Carrinho() {
             </label>
           )}
 
-          <div className="bg-white border border-stone-200 rounded-xl p-6 text-right space-y-1.5 shadow-sm">
-            <div className="text-stone-600 text-sm">
-              Subtotal: <strong className="text-stone-800">{formatarMoeda(subtotal)}</strong>
-            </div>
-            {usarSaldo && desconto > 0 && (
-              <div className="text-red-600 text-sm font-semibold">
-                Desconto do Saldo: <strong>- {formatarMoeda(desconto)}</strong>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 flex flex-col justify-between space-y-4">
+              <div>
+                <h3 className="text-lg font-black text-emerald-900">Confirmar Pedido</h3>
+                <p className="text-sm text-emerald-800 mt-1">
+                  {totalFinal === 0
+                    ? 'Seu saldo cobre o valor total do pedido. Após confirmar, o administrador validará a baixa para sua retirada!'
+                    : 'Ao finalizar, você será redirecionado para a tela de compras onde poderá anexar o comprovante do PIX.'}
+                </p>
               </div>
-            )}
-            <div className="pt-2 border-t border-stone-100 text-lg font-bold text-stone-800">
-              Total a Pagar:{' '}
-              <span className="text-2xl font-black text-emerald-600">
-                {formatarMoeda(totalFinal)}
-              </span>
+              <button
+                type="submit"
+                disabled={finalizando}
+                className="w-full py-3.5 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-xl transition shadow-md flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                <CheckCircle2 size={20} />
+                <span>
+                  {finalizando
+                    ? 'Processando...'
+                    : totalFinal === 0
+                    ? 'Finalizar Compra com Saldo'
+                    : 'Gerar Pedido & Reservar'}
+                </span>
+              </button>
             </div>
-          </div>
 
-          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 space-y-4">
-            <h3 className="text-lg font-black text-emerald-900">📱 Confirmar Pedido</h3>
-            <p className="text-sm text-emerald-800">
-              {totalFinal === 0
-                ? 'Seu saldo cobre o valor total do pedido. A reserva será confirmada imediatamente após clicar no botão, sem necessidade de PIX!'
-                : 'Ao finalizar, você será redirecionado para a tela de compras onde poderá anexar o comprovante do PIX.'}
-            </p>
-            <button
-              type="submit"
-              disabled={finalizando}
-              className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-xl transition shadow-md flex items-center justify-center gap-2 disabled:opacity-60"
-            >
-              <CheckCircle2 size={20} />
-              <span>
-                {finalizando
-                  ? 'Processando...'
-                  : totalFinal === 0
-                  ? 'Finalizar Compra com Saldo'
-                  : 'Gerar Pedido & Reservar'}
-              </span>
-            </button>
+            <div className="bg-white border border-stone-200 rounded-xl p-6 flex flex-col justify-center text-right space-y-2 shadow-sm">
+              <div className="text-stone-600 text-sm">
+                Subtotal: <strong className="text-stone-800">{formatarMoeda(subtotal)}</strong>
+              </div>
+              {usarSaldo && desconto > 0 && (
+                <div className="text-red-600 text-sm font-semibold">
+                  Desconto do Saldo: <strong>- {formatarMoeda(desconto)}</strong>
+                </div>
+              )}
+              <div className="pt-3 border-t border-stone-100 text-lg font-bold text-stone-800">
+                Total a Pagar:{' '}
+                <span className="text-3xl font-black text-emerald-600 block sm:inline">
+                  {formatarMoeda(totalFinal)}
+                </span>
+              </div>
+            </div>
           </div>
         </form>
       )}

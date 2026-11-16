@@ -2,16 +2,19 @@
 require_once 'models/LoteModel.php';
 require_once 'models/PecaModel.php';
 require_once 'models/UsuarioModel.php';
+require_once 'models/LogModel.php';
 
 class LoteController {
     private $loteModel;
     private $pecaModel;
     private $usuarioModel;
+    private $logModel;
 
     public function __construct($pdo) {
         $this->loteModel = new LoteModel($pdo);
         $this->pecaModel = new PecaModel($pdo);
         $this->usuarioModel = new UsuarioModel($pdo);
+        $this->logModel = new LogModel($pdo);
     }
     
     public function cadastrar() {
@@ -53,6 +56,7 @@ class LoteController {
         $descricao = trim($dados['descricao_lote'] ?? $_POST['descricao_lote'] ?? '');
 
         if ($this->loteModel->atualizarDescricaoLote($lote_id, $descricao)) {
+            $this->logModel->registrar($_SESSION['usuario_id'], 'EDITAR_LOTE', "Descrição do lote #{$lote_id} atualizada para: \"{$descricao}\".");
             echo json_encode(['sucesso' => true, 'mensagem' => 'Lote atualizado com sucesso!']);
         } else {
             http_response_code(500);
@@ -67,6 +71,7 @@ class LoteController {
         header('Content-Type: application/json');
         $id = $_GET['id'] ?? 0;
         if ($this->loteModel->excluirLote($id)) {
+            $this->logModel->registrar($_SESSION['usuario_id'], 'EXCLUIR_LOTE', "Lote #{$id} foi excluído permanentemente.");
             echo json_encode(['sucesso' => true, 'mensagem' => 'Lote excluído com sucesso!']);
         } else {
             http_response_code(500);
@@ -94,6 +99,8 @@ class LoteController {
                 $caminho_banco = 'comprovantes/' . $nome_arquivo;
                 $this->loteModel->salvarComprovante($lote_id, $caminho_banco);
                 $this->loteModel->atualizarStatusLote($lote_id, 4);
+
+                $this->logModel->registrar($_SESSION['usuario_id'], 'COMPROVANTE_LOTE', "Admin anexou comprovante de pagamento PIX ao lote #{$lote_id}.");
 
                 echo json_encode([
                     'sucesso' => true,
@@ -152,6 +159,8 @@ class LoteController {
             mkdir($diretorio_pecas, 0777, true);
         }
 
+        $qtdPecasCadastradas = 0;
+
         if (isset($_POST['peca_categoria']) && is_array($_POST['peca_categoria'])) {
             $total_pecas = count($_POST['peca_categoria']);
 
@@ -181,8 +190,15 @@ class LoteController {
                     $lote_id, $categoria_id, $descricao, $marca, 
                     $tamanho, $cor, $estado, $observacoes, $caminho_foto
                 );
+                $qtdPecasCadastradas++;
             }
         }
+
+        $this->logModel->registrar(
+            $_SESSION['usuario_id'],
+            'CADASTRAR_LOTE',
+            "Lote #{$lote_id} cadastrado para o fornecedor {$nome} com {$qtdPecasCadastradas} peça(s)."
+        );
 
         echo json_encode([
             'sucesso' => true,
@@ -245,6 +261,13 @@ class LoteController {
         }
 
         $this->loteModel->salvarProposta($lote_id, $valor_total);
+
+        $valorFormatado = number_format((float)$valor_total, 2, ',', '.');
+        $this->logModel->registrar(
+            $_SESSION['usuario_id'],
+            'ENVIAR_PROPOSTA',
+            "Proposta do lote #{$lote_id} finalizada no valor de R$ {$valorFormatado}."
+        );
 
         echo json_encode([
             'sucesso' => true,
@@ -322,6 +345,20 @@ class LoteController {
         }
 
         $this->loteModel->atualizarStatusLote($lote_id, $decisao);
+
+        $mapaDecisao = [
+            4 => 'Aceita via PIX',
+            5 => 'Aceita via Crédito (+15%)',
+            6 => 'Recusada',
+            7 => 'Destinada para Doação'
+        ];
+        $textoDecisao = $mapaDecisao[$decisao] ?? "Status {$decisao}";
+        $this->logModel->registrar(
+            $_SESSION['usuario_id'],
+            'RESPOSTA_PROPOSTA',
+            "Cliente respondeu à proposta do lote #{$lote_id}: {$textoDecisao}."
+        );
+
         echo json_encode([
             'sucesso' => true,
             'mensagem' => 'Sua resposta foi registrada com sucesso!'

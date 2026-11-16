@@ -37,7 +37,7 @@ export default function MeusLotes() {
 
   return (
     <div className="space-y-6 pb-8">
-      <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+      <div className="border-b border-stone-200 pb-5">
         <h2 className="text-2xl font-black text-stone-800 flex items-center gap-2">
           <Package className="text-emerald-600" size={26} />
           <span>Meus Lotes Cadastrados</span>

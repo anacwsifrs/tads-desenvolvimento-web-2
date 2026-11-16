@@ -1,11 +1,14 @@
 <?php
 require_once 'models/UsuarioModel.php';
+require_once 'models/LogModel.php';
 
 class AuthController {
     private $usuarioModel;
+    private $logModel;
 
     public function __construct($pdo) {
         $this->usuarioModel = new UsuarioModel($pdo);
+        $this->logModel = new LogModel($pdo);
     }
 
     public function login() {
@@ -36,6 +39,8 @@ class AuthController {
             $_SESSION['usuario_tipo'] = $user['tipo'];
             $_SESSION['usuario_foto'] = $user['foto'];
 
+            $this->logModel->registrar($user['id'], 'LOGIN', "Login realizado com sucesso ({$user['email']}).");
+
             unset($user['senha']);
 
             echo json_encode([
@@ -44,6 +49,7 @@ class AuthController {
                 'usuario' => $user
             ]);
         } else {
+            $this->logModel->registrar($user['id'] ?? null, 'LOGIN_FALHA', "Tentativa de login falhou para o e-mail: {$email}.");
             http_response_code(401);
             echo json_encode(['sucesso' => false, 'mensagem' => 'E-mail ou senha incorretos!']);
         }
@@ -53,6 +59,9 @@ class AuthController {
     public function logout() {
         @ob_clean();
         header('Content-Type: application/json');
+        if (isset($_SESSION['usuario_id'])) {
+            $this->logModel->registrar($_SESSION['usuario_id'], 'LOGOUT', "Usuário encerrou a sessão.");
+        }
         $_SESSION = array();
         session_destroy();
         echo json_encode(['sucesso' => true]);
@@ -81,6 +90,7 @@ class AuthController {
         $usuario = $this->usuarioModel->buscarClientePorEmail($email);
 
         if ($usuario) {
+            $this->logModel->registrar($usuario['id'], 'RECUPERAR_SENHA', "Solicitação de recuperação de senha para {$email}.");
             echo json_encode([
                 'sucesso' => true,
                 'mensagem' => "Um e-mail com as instruções de redefinição de senha foi enviado para $email."

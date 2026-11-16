@@ -1,11 +1,14 @@
 <?php
 require_once 'models/UsuarioModel.php';
+require_once 'models/LogModel.php';
 
 class UsuarioController {
     private $usuarioModel;
+    private $logModel;
 
     public function __construct($pdo) {
         $this->usuarioModel = new UsuarioModel($pdo);
+        $this->logModel = new LogModel($pdo);
     }
 
     public function buscar_cliente() {
@@ -58,7 +61,8 @@ class UsuarioController {
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
         try {
-            $this->usuarioModel->criarUsuario($cpf, $nome, $email, $senhaHash, $telefone, $pix, 'cliente', $caminhoFotoBD);
+            $novoId = $this->usuarioModel->criarUsuario($cpf, $nome, $email, $senhaHash, $telefone, $pix, 'cliente', $caminhoFotoBD);
+            $this->logModel->registrar($novoId ?: null, 'CADASTRO_USUARIO', "Novo cliente cadastrado: {$nome} ({$email}).");
             echo json_encode([
                 'sucesso' => true,
                 'mensagem' => 'Cadastro realizado com sucesso! Faça seu login.'
@@ -125,6 +129,7 @@ class UsuarioController {
 
         if ($this->usuarioModel->atualizarUsuarioBasico($id, $nome, $telefone, $pix)) {
             $_SESSION['usuario_nome'] = $nome;
+            $this->logModel->registrar($id, 'ATUALIZAR_PERFIL', "Usuário atualizou dados cadastrais do perfil.");
             echo json_encode([
                 'sucesso' => true,
                 'mensagem' => 'Perfil atualizado com sucesso!',
@@ -156,6 +161,7 @@ class UsuarioController {
         if ($usuario && password_verify($senha_atual, $usuario['senha'])) {
             $senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
             $this->usuarioModel->atualizarSenha($id, $senha_hash);
+            $this->logModel->registrar($id, 'ALTERAR_SENHA', "Usuário alterou a própria senha de acesso.");
             echo json_encode(['sucesso' => true, 'mensagem' => 'Senha alterada com sucesso!']);
         } else {
             http_response_code(400);
@@ -211,6 +217,12 @@ class UsuarioController {
         $saldo = $dados['saldo_credito'] ?? $_POST['saldo_credito'] ?? 0;
 
         if ($this->usuarioModel->atualizarUsuarioAdmin($id, $nome, $telefone, $pix, $saldo)) {
+            $saldoFormatado = number_format((float)$saldo, 2, ',', '.');
+            $this->logModel->registrar(
+                $_SESSION['usuario_id'],
+                'EDITAR_USUARIO_ADMIN',
+                "Admin atualizou cliente #{$id} ({$nome}). Saldo definido: R$ {$saldoFormatado}."
+            );
             echo json_encode(['sucesso' => true, 'mensagem' => 'Cliente atualizado com sucesso!']);
         } else {
             http_response_code(500);

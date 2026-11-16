@@ -38,13 +38,49 @@ class PedidoModel {
 
     public function listarTodosPedidos() {
         $stmt = $this->pdo->prepare("
-            SELECT p.*, u.nome as cliente_nome 
+            SELECT p.*, u.nome as cliente_nome, u.telefone as cliente_telefone
             FROM pedidos p 
             JOIN usuarios u ON p.cliente_id = u.id 
             ORDER BY p.criado_em DESC
         ");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function buscarPedidoComItens($pedido_id) {
+        $stmt = $this->pdo->prepare("
+            SELECT p.*, u.nome as cliente_nome, u.email as cliente_email, u.telefone as cliente_telefone
+            FROM pedidos p
+            JOIN usuarios u ON p.cliente_id = u.id
+            WHERE p.id = ?
+        ");
+        $stmt->execute([$pedido_id]);
+        $pedido = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$pedido) {
+            return null;
+        }
+
+        $stmtItens = $this->pdo->prepare("
+            SELECT 
+                pi.peca_id,
+                pi.preco_venda,
+                pe.descricao,
+                pe.foto_caminho,
+                pe.tamanho,
+                pe.cor,
+                pe.marca,
+                pe.estado,
+                c.nome as categoria_nome
+            FROM pedido_itens pi
+            JOIN pecas pe ON pi.peca_id = pe.id
+            JOIN categorias c ON pe.categoria_id = c.id
+            WHERE pi.pedido_id = ?
+        ");
+        $stmtItens->execute([$pedido_id]);
+        $pedido['itens'] = $stmtItens->fetchAll(PDO::FETCH_ASSOC);
+
+        return $pedido;
     }
 
     public function atualizarStatus($pedido_id, $status) {

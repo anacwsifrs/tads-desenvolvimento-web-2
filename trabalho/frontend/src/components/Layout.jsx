@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { ShoppingBag, ShoppingCart, ChevronDown, User, Package, ClipboardList, Users, LogOut, LogIn } from 'lucide-react';
+import { ShoppingBag, ShoppingCart, ChevronDown, User, Package, ClipboardList, Users, LogOut, LogIn, ScrollText } from 'lucide-react';
 
 const API_URL = 'http://localhost/brecho/index.php';
 const UPLOADS_URL = 'http://localhost/brecho/uploads/';
@@ -112,6 +112,9 @@ export default function Layout() {
                         </Link>
                         <Link to="/admin/clientes" onClick={() => setMenuAberto(false)} className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-stone-50 hover:text-emerald-600">
                           <Users size={16} /> Painel Usuários
+                        </Link>
+                        <Link to="/admin/logs" onClick={() => setMenuAberto(false)} className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-stone-50 hover:text-emerald-600">
+                          <ScrollText size={16} /> Logs do Sistema
                         </Link>
                       </>
                     ) : (

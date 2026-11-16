@@ -1,9 +1,13 @@
 <?php
+require_once 'models/LogModel.php';
+
 class ContatoController {
     private $pdo;
+    private $logModel;
 
     public function __construct($pdo) {
         $this->pdo = $pdo;
+        $this->logModel = new LogModel($pdo);
     }
 
     public function fale_conosco() {
@@ -37,6 +41,12 @@ class ContatoController {
         } catch (PDOException $e) {
             // Caso a tabela mensagens_contato ainda não exista no banco, ainda confirma o recebimento
         }
+
+        $this->logModel->registrar(
+            $_SESSION['usuario_id'] ?? null,
+            'FALE_CONOSCO',
+            "Mensagem recebida de {$nome} ({$email}) — Assunto: \"{$assunto}\"."
+        );
 
         echo json_encode([
             'sucesso' => true,
