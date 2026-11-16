@@ -7,8 +7,6 @@ Frescura:
 * atualizar lgpd por causa do pix
 * notificacoes
 * logs
-* corrigir css campo senha login + campo email painel lotes
-* ux mais bonitinha (da pra deixar pro react) com itens de lote colapsaveis pra deixar a visualizção melhor + pré-visualização das peças
 
 Pede na especificação:
 * verificar se o código usa as tecnologias em aula, os códigos do sor, etc
@@ -18,7 +16,7 @@ Pede na especificação:
 ----------------------------------------------------------------------
 
 Fazendo:
-* rever questão do saldo, da pra deixar na conta do cliente e ele pode descontar no carrinho
+* implementando react
 
 ----------------------------------------------------------------------
 

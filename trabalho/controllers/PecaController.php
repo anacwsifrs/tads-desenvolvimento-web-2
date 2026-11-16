@@ -9,26 +9,39 @@ class PecaController {
     }
 
     public function vitrine() {
-        $pecas = $this->pecaModel->listarTodasPecasPublicas();
-        require_once 'views/public/vitrine.php';
+        @ob_clean();
+        header('Content-Type: application/json');
+        echo json_encode($this->pecaModel->listarTodasPecasPublicas());
+        exit;
     }
 
     public function detalhar() {
-        $id = $_GET['id'] ?? null;
+        @ob_clean();
+        header('Content-Type: application/json');
 
+        $id = $_GET['id'] ?? null;
         if (!$id) {
-            header("Location: index.php?acao=vitrine");
+            http_response_code(400);
+            echo json_encode(['erro' => 'ID da peça não informado.']);
             exit;
         }
 
         $peca = $this->pecaModel->buscarPecaPorId($id);
-
         if (!$peca) {
-            echo "<script>alert('Peça não encontrada!'); window.location.href='index.php?acao=vitrine';</script>";
+            http_response_code(404);
+            echo json_encode(['erro' => 'Peça não encontrada.']);
             exit;
         }
 
-        require_once 'views/public/detalhar.php';
+        echo json_encode($peca);
+        exit;
+    }
+
+    public function categorias() {
+        @ob_clean();
+        header('Content-Type: application/json');
+        echo json_encode($this->pecaModel->listarCategorias());
+        exit;
     }
 }
 ?>

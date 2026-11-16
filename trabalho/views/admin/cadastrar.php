@@ -98,7 +98,7 @@
         $('#cpf').on('blur', function() {
             let cpf = $(this).val().trim();
             if (cpf !== '') {
-                $.getJSON('index.php?acao=api_buscar_cliente&cpf=' + encodeURIComponent(cpf), function(data) {
+                $.getJSON('index.php?acao=buscar_cliente&cpf=' + encodeURIComponent(cpf), function(data) {
                     if (data && data.id) {
                         $('#nome').val(data.nome);
                         $('#email').val(data.email);

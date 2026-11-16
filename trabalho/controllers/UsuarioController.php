@@ -3,24 +3,13 @@ require_once 'models/UsuarioModel.php';
 
 class UsuarioController {
     private $usuarioModel;
-    private $pdo;
 
     public function __construct($pdo) {
-        $this->pdo = $pdo;
         $this->usuarioModel = new UsuarioModel($pdo);
     }
 
-    public function perfil() {
-        if (!isset($_SESSION['usuario_id'])) {
-            header("Location: index.php?acao=login");
-            exit;
-        }
-
-        $usuario = $this->usuarioModel->buscarClientePorId($_SESSION['usuario_id']);
-        require_once 'views/cliente/perfil.php';
-    }
-
-    public function api_buscar_cliente() {
+    public function buscar_cliente() {
+        @ob_clean();
         header('Content-Type: application/json');
         $cpf = $_GET['cpf'] ?? '';
         $cliente = $this->usuarioModel->buscarClientePorCpf($cpf);
@@ -28,59 +17,86 @@ class UsuarioController {
         exit;
     }
 
-    public function cadastro() {
-        require_once 'views/public/cadastro.php';
-    }
-
     public function salvar_cadastro() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $cpf = trim($_POST['cpf'] ?? '');
-            $nome = trim($_POST['nome'] ?? '');
-            $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
-            $senha = $_POST['senha'] ?? '';
-            $telefone = trim($_POST['telefone'] ?? '');
-            $pix = trim($_POST['pix'] ?? '');
+        @ob_clean();
+        header('Content-Type: application/json');
 
-            if (!$email || empty($cpf) || empty($nome) || empty($senha)) {
-                echo "<script>alert('Preencha todos os campos corretamente!'); window.history.back();</script>";
-                exit;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Método não permitido.']);
+            exit;
+        }
+
+        $cpf = trim($_POST['cpf'] ?? '');
+        $nome = trim($_POST['nome'] ?? '');
+        $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+        $senha = $_POST['senha'] ?? '';
+        $telefone = trim($_POST['telefone'] ?? '');
+        $pix = trim($_POST['pix'] ?? '');
+
+        if (!$email || empty($cpf) || empty($nome) || empty($senha) || empty($telefone)) {
+            http_response_code(400);
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Preencha todos os campos obrigatórios corretamente!']);
+            exit;
+        }
+
+        $caminhoFotoBD = 'default.png';
+        if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+            $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+            $nomeFoto = "perfil_" . time() . "_" . uniqid() . "." . $ext;
+            
+            $diretorio = 'uploads/perfil/';
+            if (!is_dir($diretorio)) { 
+                mkdir($diretorio, 0777, true); 
             }
 
-            $caminhoFotoBD = 'default.png';
-            if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-                $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-                $nomeFoto = "perfil_" . time() . "_" . uniqid() . "." . $ext;
-                
-                $diretorio = 'uploads/perfil/';
-                if (!is_dir($diretorio)) { 
-                    mkdir($diretorio, 0777, true); 
-                }
-
-                if (move_uploaded_file($_FILES['foto']['tmp_name'], $diretorio . $nomeFoto)) {
-                    $caminhoFotoBD = 'perfil/' . $nomeFoto;
-                }
-            }
-
-            $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
-
-            try {
-                $stmt = $this->pdo->prepare("INSERT INTO usuarios (cpf, nome, email, senha, telefone, chave_pix, foto, tipo) VALUES (?, ?, ?, ?, ?, ?, ?, 'cliente')");
-                $stmt->execute([$cpf, $nome, $email, $senhaHash, $telefone, $pix, $caminhoFotoBD]);
-                
-                echo "<script>alert('Cadastro realizado com sucesso! Faça seu login.'); window.location.href='index.php?acao=login';</script>";
-                exit;
-            } catch (PDOException $e) {
-                echo "<script>alert('Erro: CPF ou E-mail já cadastrados no sistema.'); window.history.back();</script>";
-                exit;
+            if (move_uploaded_file($_FILES['foto']['tmp_name'], $diretorio . $nomeFoto)) {
+                $caminhoFotoBD = 'perfil/' . $nomeFoto;
             }
         }
+
+        $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+
+        try {
+            $this->usuarioModel->criarUsuario($cpf, $nome, $email, $senhaHash, $telefone, $pix, 'cliente', $caminhoFotoBD);
+            echo json_encode([
+                'sucesso' => true,
+                'mensagem' => 'Cadastro realizado com sucesso! Faça seu login.'
+            ]);
+        } catch (PDOException $e) {
+            http_response_code(409);
+            echo json_encode([
+                'sucesso' => false,
+                'mensagem' => 'Erro: CPF ou E-mail já cadastrados no sistema.'
+            ]);
+        }
+        exit;
     }
 
-    public function api_atualizar_perfil() {
+    public function perfil() {
+        @ob_clean();
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['usuario_id'])) {
+            http_response_code(401);
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Não autenticado.']);
+            exit;
+        }
+
+        $usuario = $this->usuarioModel->buscarClientePorId($_SESSION['usuario_id']);
+        if ($usuario) {
+            unset($usuario['senha']);
+        }
+        echo json_encode($usuario ?: []);
+        exit;
+    }
+
+    public function atualizar_perfil() {
         @ob_clean();
         header('Content-Type: application/json');
         
         if (!isset($_SESSION['usuario_id'])) {
+            http_response_code(401);
             echo json_encode(['sucesso' => false, 'mensagem' => 'Sessão expirada.']);
             exit;
         }
@@ -89,8 +105,9 @@ class UsuarioController {
         $nome = $_POST['nome'] ?? '';
         $telefone = $_POST['telefone'] ?? '';
         $pix = $_POST['pix'] ?? '';
+        $novaFoto = null;
 
-        if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
+        if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
             $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
             $nomeFoto = "perfil_" . time() . "_" . uniqid() . "." . $ext;
             
@@ -100,61 +117,58 @@ class UsuarioController {
             }
 
             if (move_uploaded_file($_FILES['foto']['tmp_name'], $diretorio . $nomeFoto)) {
-                $caminhoFotoBD = 'perfil/' . $nomeFoto;
-                $this->atualizarFotoPerfil($id, $caminhoFotoBD);
-                $_SESSION['usuario_foto'] = $caminhoFotoBD;
+                $novaFoto = 'perfil/' . $nomeFoto;
+                $this->usuarioModel->atualizarFoto($id, $novaFoto);
+                $_SESSION['usuario_foto'] = $novaFoto;
             }
         }
 
         if ($this->usuarioModel->atualizarUsuarioBasico($id, $nome, $telefone, $pix)) {
             $_SESSION['usuario_nome'] = $nome;
-            echo json_encode(['sucesso' => true, 'mensagem' => 'Perfil atualizado com sucesso!']);
+            echo json_encode([
+                'sucesso' => true,
+                'mensagem' => 'Perfil atualizado com sucesso!',
+                'foto' => $novaFoto
+            ]);
         } else {
+            http_response_code(500);
             echo json_encode(['sucesso' => false, 'mensagem' => 'Erro ao atualizar dados no banco.']);
         }
         exit;
     }
 
-    public function api_atualizar_senha() {
+    public function atualizar_senha() {
         @ob_clean();
         header('Content-Type: application/json');
+
         if (!isset($_SESSION['usuario_id'])) {
+            http_response_code(401);
             echo json_encode(['sucesso' => false, 'mensagem' => 'Sessão expirada.']);
             exit;
         }
 
         $id = $_SESSION['usuario_id'];
-        $senha_atual = $_POST['senha_atual'] ?? '';
-        $nova_senha = $_POST['nova_senha'] ?? '';
+        $dados = json_decode(file_get_contents('php://input'), true);
+        $senha_atual = $dados['senha_atual'] ?? $_POST['senha_atual'] ?? '';
+        $nova_senha = $dados['nova_senha'] ?? $_POST['nova_senha'] ?? '';
 
         $usuario = $this->usuarioModel->buscarClientePorId($id);
         if ($usuario && password_verify($senha_atual, $usuario['senha'])) {
             $senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
-            $stmt = $this->pdo->prepare("UPDATE usuarios SET senha = ? WHERE id = ?");
-            $stmt->execute([$senha_hash, $id]);
+            $this->usuarioModel->atualizarSenha($id, $senha_hash);
             echo json_encode(['sucesso' => true, 'mensagem' => 'Senha alterada com sucesso!']);
         } else {
+            http_response_code(400);
             echo json_encode(['sucesso' => false, 'mensagem' => 'Senha atual incorreta.']);
         }
         exit;
     }
 
+    // --- Métodos Admin (serão convertidos para JSON quando migrarmos as telas admin) ---
     public function clientes() {
         $this->verificarAdmin();
         $clientes = $this->usuarioModel->listarClientes();
         require_once 'views/admin/clientes.php';
-    }
-
-    private function verificarAdmin() {
-        if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'admin') {
-            header("Location: index.php?acao=meus_lotes");
-            exit;
-        }
-    }
-
-    private function atualizarFotoPerfil($id, $caminhoFoto) {
-        $stmt = $this->pdo->prepare("UPDATE usuarios SET foto = ? WHERE id = ?");
-        $stmt->execute([$caminhoFoto, $id]);
     }
 
     public function ver_cliente() {
@@ -187,6 +201,13 @@ class UsuarioController {
             } else {
                 echo "<script>alert('Erro ao atualizar cliente.'); window.history.back();</script>";
             }
+        }
+    }
+
+    private function verificarAdmin() {
+        if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'admin') {
+            header("Location: index.php?acao=meus_lotes");
+            exit;
         }
     }
 }

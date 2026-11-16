@@ -28,9 +28,9 @@ class UsuarioModel {
         return $stmt->execute([$valor_debitar, $cliente_id]);
     }
 
-    public function criarUsuario($cpf, $nome, $email, $senha_hash, $telefone, $pix, $tipo = 'cliente') {
-        $stmt = $this->conn->prepare("INSERT INTO usuarios (cpf, nome, email, senha, telefone, chave_pix, tipo) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$cpf, $nome, $email, $senha_hash, $telefone, $pix, $tipo]);
+    public function criarUsuario($cpf, $nome, $email, $senha_hash, $telefone, $pix, $tipo = 'cliente', $foto = 'default.png') {
+        $stmt = $this->conn->prepare("INSERT INTO usuarios (cpf, nome, email, senha, telefone, chave_pix, foto, tipo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$cpf, $nome, $email, $senha_hash, $telefone, $pix, $foto, $tipo]);
         return $this->conn->lastInsertId();
     }
 
@@ -52,6 +52,22 @@ class UsuarioModel {
     public function adicionarSaldoCliente($cliente_id, $valor) {
         $stmt = $this->conn->prepare("UPDATE usuarios SET saldo_credito = saldo_credito + ? WHERE id = ?");
         return $stmt->execute([$valor, $cliente_id]);
+    }
+
+    public function buscarClientePorEmail($email) {
+        $stmt = $this->conn->prepare("SELECT * FROM usuarios WHERE email = ?");
+        $stmt->execute([$email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function atualizarSenha($id, $senha_hash) {
+        $stmt = $this->conn->prepare("UPDATE usuarios SET senha = ? WHERE id = ?");
+        return $stmt->execute([$senha_hash, $id]);
+    }
+
+    public function atualizarFoto($id, $caminho_foto) {
+        $stmt = $this->conn->prepare("UPDATE usuarios SET foto = ? WHERE id = ?");
+        return $stmt->execute([$caminho_foto, $id]);
     }
 }
 ?>

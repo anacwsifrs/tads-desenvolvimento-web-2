@@ -110,7 +110,7 @@
         e.preventDefault(); 
         let formData = new FormData(this);
 
-        fetch('index.php?acao=api_atualizar_perfil', {
+        fetch('index.php?acao=atualizar_perfil', {
             method: 'POST',
             body: formData
         })
@@ -130,7 +130,7 @@
         e.preventDefault();
         let formData = new FormData(this);
 
-        fetch('index.php?acao=api_atualizar_senha', {
+        fetch('index.php?acao=atualizar_senha', {
             method: 'POST',
             body: formData
         })
