@@ -95,10 +95,14 @@
                             <small style="color:#888;">N/A</small>
                         <?php endif; ?>
                     </td>
-                    <td>
-                        <a href="index.php?acao=avaliar&id=<?= $l['id'] ?>" class="btn-acao btn-avaliar">🔍 Avaliar</a>
-                        <a href="index.php?acao=editar&id=<?= $l['id'] ?>" class="btn-acao btn-editar">✏️ Editar</a>
-                        <a href="index.php?acao=excluir&id=<?= $l['id'] ?>" class="btn-acao btn-excluir" onclick="return confirm('Excluir este lote?')">🗑️</a>
+                    <td style="text-align: center;">
+                        <?php if ($l['status'] < 3): ?>
+                            <a href="index.php?acao=avaliar&id=<?= $l['id'] ?>" class="btn-acao btn-avaliar" title="Avaliar Lote">⚖️ Avaliar</a>
+                            <a href="index.php?acao=editar&id=<?= $l['id'] ?>" class="btn-acao btn-editar" title="Editar Lote">✏️</a>
+                            <a href="index.php?acao=excluir&id=<?= $l['id'] ?>" class="btn-acao btn-excluir" onclick="return confirm('Tem certeza que deseja excluir este lote?');" title="Excluir Lote">🗑️</a>
+                        <?php else: ?>
+                            <a href="index.php?acao=avaliar&id=<?= $l['id'] ?>" class="btn-acao btn-ver" style="background: #17a2b8; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-weight: bold;" title="Ver Detalhes da Proposta">👁️ Ver Detalhes</a>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

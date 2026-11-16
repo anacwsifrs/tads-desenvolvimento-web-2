@@ -49,6 +49,11 @@
             <input type="text" name="pix" value="<?= htmlspecialchars($usuario['chave_pix'] ?? '') ?>">
         </div>
         <div class="form-group">
+            <label>Saldo de Crédito em Loja:</label>
+            <input type="text" value="R$ <?= number_format($usuario['saldo_credito'] ?? 0, 2, ',', '.') ?>" readonly style="background: #e8f5e9; color: #28a745; font-weight: bold; font-size: 16px; cursor: not-allowed;">
+            <small style="color: #666;">Este saldo pode ser utilizado como desconto ou pagamento integral no carrinho de compras.</small>
+        </div>
+        <div class="form-group">
             <label>Nova Foto de Perfil (Opcional):</label>
             <input type="file" name="foto" accept="image/*">
         </div>

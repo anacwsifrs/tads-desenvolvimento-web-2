@@ -65,7 +65,10 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($lote['pecas'] as $peca): ?>
+                <?php foreach ($lote['pecas'] as $peca): 
+                    $status = $peca['status_avaliacao'] ?? 0;
+                    $valor = $peca['valor_proposto'] ?? '';
+                ?>
                     <tr id="linha-peca-<?= $peca['id'] ?>" 
                         data-categoria="<?= htmlspecialchars($peca['categoria_nome'] ?? '') ?>"
                         data-marca="<?= htmlspecialchars($peca['marca'] ?? '') ?>"
@@ -99,23 +102,23 @@
                         </td>
 
                         <td>
-                            <input type="hidden" name="pecas[<?= $peca['id'] ?>][status]" id="status_<?= $peca['id'] ?>" class="status-input" value="0">
-                            <button type="button" class="btn-acao btn-aprovar" id="btn_aprov_<?= $peca['id'] ?>" onclick="avaliarPeca(<?= $peca['id'] ?>, 1)">✔️ Aprovar</button>
-                            <button type="button" class="btn-acao btn-reprovar" id="btn_reprov_<?= $peca['id'] ?>" onclick="avaliarPeca(<?= $peca['id'] ?>, 2)">❌ Reprovar</button>
+                            <input type="hidden" name="pecas[<?= $peca['id'] ?>][status]" id="status_<?= $peca['id'] ?>" class="status-input" value="<?= $status ?>">
+                            <button type="button" class="btn-acao btn-aprovar <?= $status == 1 ? 'ativo' : '' ?>" id="btn_aprov_<?= $peca['id'] ?>" onclick="avaliarPeca(<?= $peca['id'] ?>, 1)">✔️ Aprovar</button>
+                            <button type="button" class="btn-acao btn-reprovar <?= $status == 2 ? 'ativo' : '' ?>" id="btn_reprov_<?= $peca['id'] ?>" onclick="avaliarPeca(<?= $peca['id'] ?>, 2)">❌ Reprovar</button>
                         </td>
 
                         <td>
                             <div style="display: flex; gap: 8px; align-items: center; position: relative;">
-                                <div id="box-valor-<?= $peca['id'] ?>" style="display: none;">
-                                    <input type="number" step="0.01" min="0" name="pecas[<?= $peca['id'] ?>][valor]" id="valor_<?= $peca['id'] ?>" class="input-valor" placeholder="0.00" oninput="calcularTotal()">
+                                <div id="box-valor-<?= $peca['id'] ?>" style="display: <?= $status == 1 ? 'block' : 'none' ?>;">
+                                    <input type="number" step="0.01" min="0" name="pecas[<?= $peca['id'] ?>][valor]" id="valor_<?= $peca['id'] ?>" class="input-valor" placeholder="0.00" value="<?= htmlspecialchars($valor) ?>" oninput="calcularTotal()" <?= $status == 1 ? 'required' : '' ?>>
                                 </div>
                                 
-                                <small id="txt-reprovado-<?= $peca['id'] ?>" style="color: #888;">Pendente</small>
+                                <small id="txt-reprovado-<?= $peca['id'] ?>" style="color: #888; display: <?= $status == 1 ? 'none' : 'inline' ?>;">
+                                    <?= $status == 2 ? 'Reprovado' : 'Pendente' ?>
+                                </small>
 
                                 <div class="ia-wrapper">
-                                    <button type="button" id="btn-ia-<?= $peca['id'] ?>" onclick="handleCliqueIA(<?= $peca['id'] ?>)" class="btn-ia-icon" title="Sugestão IA">
-                                        ✨
-                                    </button>
+                                    <button type="button" id="btn-ia-<?= $peca['id'] ?>" onclick="handleCliqueIA(<?= $peca['id'] ?>)" class="btn-ia-icon" title="Sugestão IA">✨</button>
 
                                     <div class="ia-popover" id="popover-ia-<?= $peca['id'] ?>">
                                         <div class="ia-popover-header">
@@ -134,14 +137,36 @@
         
         <div class="total-box">
             <strong>Valor Total da Proposta: R$ </strong>
-            <input type="text" name="valor_total" id="valor_total" value="0.00" readonly style="border:none; background:transparent; font-size:20px; font-weight:bold; width:120px; outline:none;">
+            <input type="text" name="valor_total" id="valor_total" value="<?= number_format($lote['valor_proposta'] ?? 0, 2, '.', '') ?>" readonly style="border:none; background:transparent; font-size:20px; font-weight:bold; width:120px; outline:none;">
         </div>
         
-        <button type="submit" class="btn-salvar" onclick="return validarFormulario()">Salvar Avaliação e Gerar Proposta</button>
+        <?php if ($lote['status'] < 3): ?>
+            <button type="submit" class="btn-salvar" onclick="return validarFormulario()">Salvar Avaliação e Gerar Proposta</button>
+        <?php else: ?>
+            <div style="background: #e9ecef; color: #495057; padding: 15px; text-align: center; border-radius: 5px; font-weight: bold; margin-top: 20px;">
+                ⚠️ Esta avaliação já foi enviada e finalizada. Não é possível alterar a proposta.
+            </div>
+            <button type="button" class="btn-salvar" style="background: #6c757d; cursor: not-allowed; opacity: 0.7;" disabled>Avaliação Bloqueada</button>
+            
+            <script>
+                document.querySelectorAll('.btn-acao').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.cursor = 'not-allowed';
+                    btn.removeAttribute('onclick');
+                });
+                document.querySelectorAll('.input-valor').forEach(input => {
+                    input.readOnly = true;
+                });
+            </script>
+        <?php endif; ?>
     </div>
 </form>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        calcularTotal();
+    });
+
     const memoriaRespostaIA = {};
 
     function avaliarPeca(pecaId, status) {
@@ -177,7 +202,7 @@
         let inputsValor = document.querySelectorAll('.input-valor');
         
         inputsValor.forEach(function(input) {
-            if (input.parentElement.style.display === 'block' && input.value !== '') {
+            if (input.parentElement.style.display !== 'none' && input.value !== '') {
                 total += parseFloat(input.value);
             }
         });

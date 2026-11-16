@@ -168,6 +168,12 @@ class LoteController {
                 die("<h3>Acesso negado.</h3>");
             }
 
+            if ($decisao == 5) {
+                $valor_pix = $lote['valor_proposta'];
+                $valor_credito = $valor_pix * 1.15;
+                $this->usuarioModel->adicionarSaldoCliente($lote['cliente_id'], $valor_credito);
+            }
+
             $this->loteModel->atualizarStatusLote($lote_id, $decisao);
             echo "<script>alert('Sua resposta foi registrada com sucesso!'); window.location.href='index.php?acao=proposta&id=$lote_id';</script>";
             exit;

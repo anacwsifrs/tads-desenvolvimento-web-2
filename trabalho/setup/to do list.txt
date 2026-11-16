@@ -8,8 +8,8 @@ Frescura:
 * atualizar lgpd por causa do pix
 * notificacoes
 * logs
-* já avaliei o lote e ao clicar nele de novo é como se nao tivesse avaliado
-* corrigir css campo senha login
+* corrigir css campo senha login + campo email painel lotes
+* ux mais bonitinha (da pra deixar pro react) com itens de lote colapsaveis pra deixar a visualizção melhor + pré-visualização das peças
 
 Pede na especificação:
 * melhorar/unificar css + usar react em alguma coisa + verificar se o código usa react e se usa as tecnologias em aula, os códigos do sor, etc

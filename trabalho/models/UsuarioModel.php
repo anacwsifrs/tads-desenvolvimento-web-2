@@ -45,8 +45,13 @@ class UsuarioModel {
     }
 
     public function atualizarUsuarioAdmin($id, $nome, $telefone, $pix, $saldo) {
-        $stmt = $this->pdo->prepare("UPDATE usuarios SET nome = ?, telefone = ?, chave_pix = ?, saldo_credito = ? WHERE id = ?");
+        $stmt = $this->conn->prepare("UPDATE usuarios SET nome = ?, telefone = ?, chave_pix = ?, saldo_credito = ? WHERE id = ?");
         return $stmt->execute([$nome, $telefone, $pix, $saldo, $id]);
+    }
+
+    public function adicionarSaldoCliente($cliente_id, $valor) {
+        $stmt = $this->conn->prepare("UPDATE usuarios SET saldo_credito = saldo_credito + ? WHERE id = ?");
+        return $stmt->execute([$valor, $cliente_id]);
     }
 }
 ?>
