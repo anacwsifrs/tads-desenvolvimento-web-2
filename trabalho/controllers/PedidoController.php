@@ -3,18 +3,21 @@ require_once 'models/PedidoModel.php';
 require_once 'models/PecaModel.php';
 require_once 'models/UsuarioModel.php';
 require_once 'models/LogModel.php';
+require_once 'helpers/EmailHelper.php';
 
 class PedidoController {
     private $pedidoModel;
     private $pecaModel;
     private $usuarioModel;
     private $logModel;
+    private $emailHelper;
 
     public function __construct($pdo) {
         $this->pedidoModel = new PedidoModel($pdo);
         $this->pecaModel = new PecaModel($pdo);
         $this->usuarioModel = new UsuarioModel($pdo);
         $this->logModel = new LogModel($pdo);
+        $this->emailHelper = new EmailHelper($pdo);
     }
 
     public function carrinho() {
@@ -239,6 +242,26 @@ class PedidoController {
         $pedido_id = $_GET['id'] ?? 0;
         $this->pedidoModel->atualizarStatus($pedido_id, 'Aprovado');
         $this->logModel->registrar($_SESSION['usuario_id'], 'APROVAR_PEDIDO', "Admin aprovou o pedido #PED-{$pedido_id}.");
+
+        $pedido = $this->pedidoModel->buscarPedidoComItens($pedido_id);
+        if ($pedido && !empty($pedido['cliente_email'])) {
+            $valorFormatado = number_format((float)$pedido['valor_total'], 2, ',', '.');
+            $html = "
+                <p>Olá, <strong>{$pedido['cliente_nome']}</strong>!</p>
+                <p>Seu pedido <strong>#PED-{$pedido_id}</strong> (Valor final: <strong>R$ {$valorFormatado}</strong>) foi <strong>APROVADO</strong> pela nossa equipe!</p>
+                <div style='background:#ecfdf5; border:1px solid #a7f3d0; padding:12px 16px; border-radius:8px; margin:16px 0; color:#065f46;'>
+                    Suas peças já estão separadas e prontas para retirada presencial no balcão do <strong>Intent Brechó</strong>.
+                </div>
+                <p>Você pode conferir os detalhes das peças reservadas a qualquer momento na aba <strong>Minhas Compras</strong>.</p>
+            ";
+            $this->emailHelper->enviar(
+                $pedido['cliente_email'],
+                $pedido['cliente_nome'],
+                "Pedido #PED-{$pedido_id} Aprovado para Retirada - Intent Brechó",
+                $html
+            );
+        }
+
         echo json_encode(['sucesso' => true, 'mensagem' => 'Pedido aprovado com sucesso!']);
         exit;
     }
@@ -248,8 +271,25 @@ class PedidoController {
         @ob_clean();
         header('Content-Type: application/json');
         $pedido_id = $_GET['id'] ?? 0;
+        $pedido = $this->pedidoModel->buscarPedidoComItens($pedido_id);
+
         $this->pedidoModel->cancelarPedidoERestaurarPecas($pedido_id);
         $this->logModel->registrar($_SESSION['usuario_id'], 'CANCELAR_PEDIDO', "Admin cancelou o pedido #PED-{$pedido_id} e devolveu as peças à vitrine.");
+
+        if ($pedido && !empty($pedido['cliente_email'])) {
+            $html = "
+                <p>Olá, <strong>{$pedido['cliente_nome']}</strong>.</p>
+                <p>Informamos que o seu pedido <strong>#PED-{$pedido_id}</strong> foi <strong>cancelado</strong> pela administração e as peças voltaram a ficar disponíveis na vitrine.</p>
+                <p>Caso tenha dúvidas ou precise de auxílio com uma nova reserva, entre em contato conosco pela página <strong>Fale Conosco</strong>.</p>
+            ";
+            $this->emailHelper->enviar(
+                $pedido['cliente_email'],
+                $pedido['cliente_nome'],
+                "Pedido #PED-{$pedido_id} Cancelado - Intent Brechó",
+                $html
+            );
+        }
+
         echo json_encode(['sucesso' => true, 'mensagem' => 'Pedido cancelado e peças devolvidas à vitrine!']);
         exit;
     }

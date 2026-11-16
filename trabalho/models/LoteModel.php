@@ -14,7 +14,7 @@ class LoteModel {
 
     public function buscarLotePorId($id) {
         $stmt = $this->conn->prepare("
-            SELECT l.*, c.cpf, c.nome as cliente_nome, c.telefone, c.chave_pix, c.saldo_credito 
+            SELECT l.*, c.cpf, c.nome as cliente_nome, c.email as cliente_email, c.telefone, c.chave_pix, c.saldo_credito 
             FROM lotes l 
             JOIN usuarios c ON l.cliente_id = c.id 
             WHERE l.id = ?

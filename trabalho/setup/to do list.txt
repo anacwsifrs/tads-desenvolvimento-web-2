@@ -1,9 +1,4 @@
-Frescura:
-* notificacoes
-* logs
-* implementar envio de email
-
-Pede na especificação:
+Pendente:
 * verificar se o código usa as tecnologias em aula, os códigos do sor, etc
 * Hospedar Locaweb 
 
@@ -21,6 +16,8 @@ Feito:
 * 2 telas de listagem públicas (início e vitrine)
 * Deve possuir um botão de compra que manda para a tela do carrinho;
 * Implementado react
+* logs
+* envio de email
 
 ----------------------------------------------------------------------
 

@@ -1,14 +1,17 @@
 <?php
 require_once 'models/UsuarioModel.php';
 require_once 'models/LogModel.php';
+require_once 'helpers/EmailHelper.php';
 
 class AuthController {
     private $usuarioModel;
     private $logModel;
+    private $emailHelper;
 
     public function __construct($pdo) {
         $this->usuarioModel = new UsuarioModel($pdo);
         $this->logModel = new LogModel($pdo);
+        $this->emailHelper = new EmailHelper($pdo);
     }
 
     public function login() {
@@ -90,11 +93,35 @@ class AuthController {
         $usuario = $this->usuarioModel->buscarClientePorEmail($email);
 
         if ($usuario) {
-            $this->logModel->registrar($usuario['id'], 'RECUPERAR_SENHA', "Solicitação de recuperação de senha para {$email}.");
-            echo json_encode([
-                'sucesso' => true,
-                'mensagem' => "Um e-mail com as instruções de redefinição de senha foi enviado para $email."
-            ]);
+            $senhaProvisoria = 'Brecho@' . rand(1000, 9999);
+            $senhaHash = password_hash($senhaProvisoria, PASSWORD_DEFAULT);
+            $this->usuarioModel->atualizarSenha($usuario['id'], $senhaHash);
+
+            $html = "
+                <p>Olá, <strong>{$usuario['nome']}</strong>!</p>
+                <p>Recebemos uma solicitação de recuperação de senha para a sua conta no <strong>Intent Brechó</strong>.</p>
+                <p>Sua nova senha provisória de acesso é:</p>
+                <div style='background:#ecfdf5; border:1px solid #a7f3d0; padding:12px 16px; border-radius:8px; font-size:18px; font-weight:bold; color:#065f46; text-align:center; margin:16px 0;'>
+                    {$senhaProvisoria}
+                </div>
+                <p>Recomendamos que você acesse a aba <strong>Meu Perfil &rarr; Segurança</strong> logo após entrar para definir uma senha pessoal.</p>
+            ";
+
+            $envio = $this->emailHelper->enviar($email, $usuario['nome'], 'Recuperação de Senha - Intent Brechó', $html);
+
+            $this->logModel->registrar($usuario['id'], 'RECUPERAR_SENHA', "Senha provisória gerada para {$email}.");
+
+            if ($envio['sucesso']) {
+                echo json_encode([
+                    'sucesso' => true,
+                    'mensagem' => "Uma senha provisória foi enviada para {$email}. Verifique sua caixa de entrada (e spam)."
+                ]);
+            } else {
+                echo json_encode([
+                    'sucesso' => true,
+                    'mensagem' => "Senha redefinida no sistema, porém houve falha no envio SMTP: {$envio['erro']}"
+                ]);
+            }
         } else {
             http_response_code(404);
             echo json_encode([

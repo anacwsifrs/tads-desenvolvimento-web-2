@@ -3,18 +3,21 @@ require_once 'models/LoteModel.php';
 require_once 'models/PecaModel.php';
 require_once 'models/UsuarioModel.php';
 require_once 'models/LogModel.php';
+require_once 'helpers/EmailHelper.php';
 
 class LoteController {
     private $loteModel;
     private $pecaModel;
     private $usuarioModel;
     private $logModel;
+    private $emailHelper;
 
     public function __construct($pdo) {
         $this->loteModel = new LoteModel($pdo);
         $this->pecaModel = new PecaModel($pdo);
         $this->usuarioModel = new UsuarioModel($pdo);
         $this->logModel = new LogModel($pdo);
+        $this->emailHelper = new EmailHelper($pdo);
     }
     
     public function cadastrar() {
@@ -101,6 +104,22 @@ class LoteController {
                 $this->loteModel->atualizarStatusLote($lote_id, 4);
 
                 $this->logModel->registrar($_SESSION['usuario_id'], 'COMPROVANTE_LOTE', "Admin anexou comprovante de pagamento PIX ao lote #{$lote_id}.");
+
+                $lote = $this->loteModel->buscarLotePorId($lote_id);
+                if ($lote && !empty($lote['cliente_email'])) {
+                    $valorFormatado = number_format((float)$lote['valor_proposta'], 2, ',', '.');
+                    $html = "
+                        <p>Olá, <strong>{$lote['cliente_nome']}</strong>!</p>
+                        <p>O pagamento via <strong>PIX</strong> referente ao seu <strong>Lote #{$lote_id}</strong> ({$lote['descricao']}) no valor de <strong>R$ {$valorFormatado}</strong> foi realizado!</p>
+                        <p>O comprovante já está disponível para visualização na aba <strong>Meus Lotes</strong> do seu painel.</p>
+                    ";
+                    $this->emailHelper->enviar(
+                        $lote['cliente_email'],
+                        $lote['cliente_nome'],
+                        "Pagamento PIX Realizado - Lote #{$lote_id} | Intent Brechó",
+                        $html
+                    );
+                }
 
                 echo json_encode([
                     'sucesso' => true,
@@ -263,11 +282,33 @@ class LoteController {
         $this->loteModel->salvarProposta($lote_id, $valor_total);
 
         $valorFormatado = number_format((float)$valor_total, 2, ',', '.');
+        $valorCreditoFormatado = number_format((float)$valor_total * 1.15, 2, ',', '.');
+
         $this->logModel->registrar(
             $_SESSION['usuario_id'],
             'ENVIAR_PROPOSTA',
             "Proposta do lote #{$lote_id} finalizada no valor de R$ {$valorFormatado}."
         );
+
+        $lote = $this->loteModel->buscarLotePorId($lote_id);
+        if ($lote && !empty($lote['cliente_email'])) {
+            $html = "
+                <p>Olá, <strong>{$lote['cliente_nome']}</strong>!</p>
+                <p>A triagem e avaliação do seu <strong>Lote #{$lote_id}</strong> ({$lote['descricao']}) foi concluída!</p>
+                <div style='background:#ecfdf5; border:1px solid #a7f3d0; padding:14px 16px; border-radius:8px; margin:16px 0;'>
+                    <p style='margin:0 0 6px 0;'><strong>Opção 1 — Receber via PIX:</strong> R$ {$valorFormatado}</p>
+                    <p style='margin:0;'><strong>Opção 2 — Receber em Crédito na Loja (+15% de bônus):</strong> R$ {$valorCreditoFormatado}</p>
+                </div>
+                <p>Acesse sua conta no <strong>Intent Brechó</strong> (menu <em>Meus Lotes</em>) para conferir a avaliação peça a peça e responder à proposta.</p>
+                <p style='font-size:13px; color:#78716c;'><strong>Importante:</strong> O prazo para aceite ou retirada das peças é de <strong>3 dias úteis</strong>.</p>
+            ";
+            $this->emailHelper->enviar(
+                $lote['cliente_email'],
+                $lote['cliente_nome'],
+                "Proposta Pronta para o Lote #{$lote_id} - Intent Brechó",
+                $html
+            );
+        }
 
         echo json_encode([
             'sucesso' => true,

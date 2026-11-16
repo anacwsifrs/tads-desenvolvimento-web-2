@@ -1,14 +1,17 @@
 <?php
 require_once 'models/UsuarioModel.php';
 require_once 'models/LogModel.php';
+require_once 'helpers/EmailHelper.php';
 
 class UsuarioController {
     private $usuarioModel;
     private $logModel;
+    private $emailHelper;
 
     public function __construct($pdo) {
         $this->usuarioModel = new UsuarioModel($pdo);
         $this->logModel = new LogModel($pdo);
+        $this->emailHelper = new EmailHelper($pdo);
     }
 
     public function buscar_cliente() {
@@ -63,6 +66,24 @@ class UsuarioController {
         try {
             $novoId = $this->usuarioModel->criarUsuario($cpf, $nome, $email, $senhaHash, $telefone, $pix, 'cliente', $caminhoFotoBD);
             $this->logModel->registrar($novoId ?: null, 'CADASTRO_USUARIO', "Novo cliente cadastrado: {$nome} ({$email}).");
+
+            $html = "
+                <p>Olá, <strong>{$nome}</strong>! Seja muito bem-vindo(a) ao <strong>Intent Brechó</strong>!</p>
+                <p>Seu cadastro foi concluído com sucesso. Agora você já pode:</p>
+                <ul style='padding-left:20px; color:#44403c;'>
+                    <li>Acompanhar a avaliação dos seus lotes e responder propostas (PIX ou Crédito com <strong>+15% de bônus</strong>);</li>
+                    <li>Explorar nossa vitrine e reservar peças exclusivas;</li>
+                    <li>Utilizar seu saldo acumulado diretamente no carrinho.</li>
+                </ul>
+                <p>Bom garimpo!</p>
+            ";
+            $this->emailHelper->enviar(
+                $email,
+                $nome,
+                'Bem-vindo(a) ao Intent Brechó!',
+                $html
+            );
+
             echo json_encode([
                 'sucesso' => true,
                 'mensagem' => 'Cadastro realizado com sucesso! Faça seu login.'

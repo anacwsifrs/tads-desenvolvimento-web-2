@@ -1,13 +1,16 @@
 <?php
 require_once 'models/LogModel.php';
+require_once 'helpers/EmailHelper.php';
 
 class ContatoController {
     private $pdo;
     private $logModel;
+    private $emailHelper;
 
     public function __construct($pdo) {
         $this->pdo = $pdo;
         $this->logModel = new LogModel($pdo);
+        $this->emailHelper = new EmailHelper($pdo);
     }
 
     public function fale_conosco() {
@@ -39,8 +42,26 @@ class ContatoController {
             $stmt = $this->pdo->prepare("INSERT INTO mensagens_contato (nome, email, assunto, mensagem) VALUES (?, ?, ?, ?)");
             $stmt->execute([$nome, $email, $assunto, $mensagem]);
         } catch (PDOException $e) {
-            // Caso a tabela mensagens_contato ainda não exista no banco, ainda confirma o recebimento
         }
+
+        $emailBrecho = $_ENV['SMTP_USER'] ?? 'intent.brecho.contato@gmail.com';
+        $htmlAdmin = "
+            <p>Nova mensagem recebida pelo formulário <strong>Fale Conosco</strong>:</p>
+            <p><strong>Nome:</strong> {$nome}<br>
+            <strong>E-mail:</strong> {$email}<br>
+            <strong>Assunto:</strong> {$assunto}</p>
+            <div style='background:#f5f5f4; padding:12px; border-radius:8px; margin-top:12px;'>
+                " . nl2br(htmlspecialchars($mensagem)) . "
+            </div>
+        ";
+        $this->emailHelper->enviar($emailBrecho, 'Equipe Intent Brechó', "[Fale Conosco] {$assunto}", $htmlAdmin);
+
+        $htmlUsuario = "
+            <p>Olá, <strong>{$nome}</strong>!</p>
+            <p>Recebemos sua mensagem com o assunto <strong>\"{$assunto}\"</strong> e nossa equipe responderá em breve.</p>
+            <p style='color:#78716c; font-size:13px;'>Cópia da sua mensagem:<br><em>" . nl2br(htmlspecialchars($mensagem)) . "</em></p>
+        ";
+        $this->emailHelper->enviar($email, $nome, "Recebemos sua mensagem - Intent Brechó", $htmlUsuario);
 
         $this->logModel->registrar(
             $_SESSION['usuario_id'] ?? null,
@@ -50,7 +71,7 @@ class ContatoController {
 
         echo json_encode([
             'sucesso' => true,
-            'mensagem' => 'Mensagem enviada com sucesso! Nossa equipe responderá em breve.'
+            'mensagem' => 'Mensagem enviada com sucesso! Enviamos uma cópia de confirmação para o seu e-mail.'
         ]);
         exit;
     }
