@@ -1,19 +1,23 @@
 <?php
 require_once 'models/PedidoModel.php';
 require_once 'models/PecaModel.php';
+require_once 'models/UsuarioModel.php';
 
 class PedidoController {
     private $pedidoModel;
     private $pecaModel;
+    private $usuarioModel;
 
     public function __construct($pdo) {
         $this->pedidoModel = new PedidoModel($pdo);
         $this->pecaModel = new PecaModel($pdo);
+        $this->usuarioModel = new UsuarioModel($pdo);
     }
 
     public function carrinho() {
         $this->verificarLogin();
         $itensCarrinho = $_SESSION['carrinho'] ?? [];
+        $cliente = $this->usuarioModel->buscarClientePorId($_SESSION['usuario_id']);
         require_once 'views/cliente/carrinho.php';
     }
 
@@ -58,13 +62,45 @@ class PedidoController {
 
         $cliente_id = $_SESSION['usuario_id'];
         $itens = $_SESSION['carrinho'];
-        $valor_total = array_sum(array_column($itens, 'preco_venda'));
+        $valor_total_pedido = array_sum(array_column($itens, 'preco_venda'));
+        
+        $usar_saldo = isset($_POST['usar_saldo']) ? true : false;
+        $valor_final_a_pagar = $valor_total_pedido;
+        $status_pedido = 'Aguardando PIX';
+        
+        if ($usar_saldo) {
+            $cliente = $this->usuarioModel->buscarClientePorId($cliente_id);
+            $saldo_disponivel = $cliente['saldo_credito'];
+            
+            if ($saldo_disponivel > 0) {
+                if ($saldo_disponivel >= $valor_total_pedido) {
+                    $saldo_descontado = $valor_total_pedido;
+                    $valor_final_a_pagar = 0;
+                    $status_pedido = 'Aprovado';
+                } else {
+                    $saldo_descontado = $saldo_disponivel;
+                    $valor_final_a_pagar = $valor_total_pedido - $saldo_disponivel;
+                }
+                
+                $novo_saldo = $saldo_disponivel - $saldo_descontado;
+                $this->usuarioModel->atualizarUsuarioAdmin($cliente_id, $cliente['nome'], $cliente['telefone'], $cliente['chave_pix'], $novo_saldo);
+            }
+        }
 
-        $pedido_id = $this->pedidoModel->criarPedido($cliente_id, $valor_total, $itens);
+        $pedido_id = $this->pedidoModel->criarPedido($cliente_id, $valor_final_a_pagar, $itens);
 
         if ($pedido_id) {
+            if ($valor_final_a_pagar == 0) {
+                $this->pedidoModel->atualizarStatus($pedido_id, 'Aprovado');
+            }
+            
             $_SESSION['carrinho'] = [];
-            echo "<script>alert('Pedido gerado com sucesso! Efetue o PIX e anexe o comprovante.'); window.location.href='index.php?acao=meus_pedidos';</script>";
+            
+            if ($valor_final_a_pagar == 0) {
+                echo "<script>alert('Pedido gerado e pago integralmente com seu saldo! Peças reservadas.'); window.location.href='index.php?acao=meus_pedidos';</script>";
+            } else {
+                echo "<script>alert('Pedido gerado! Valor pendente: R$ " . number_format($valor_final_a_pagar, 2, ',', '.') . ". Efetue o PIX e anexe o comprovante.'); window.location.href='index.php?acao=meus_pedidos';</script>";
+            }
         } else {
             echo "<script>alert('Erro ao processar compra.'); window.location.href='index.php?acao=carrinho';</script>";
         }
