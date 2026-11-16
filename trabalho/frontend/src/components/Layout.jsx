@@ -44,7 +44,7 @@ export default function Layout() {
           <div className="flex items-center gap-8">
             <Link to="/" className="text-xl font-black tracking-tight flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition">
               <ShoppingBag size={24} />
-              <span>Brechó EcoModa</span>
+              <span>Intent Brechó</span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-stone-300">
@@ -150,7 +150,7 @@ export default function Layout() {
       </main>
 
       <footer className="bg-stone-200 text-stone-600 text-center py-6 border-t border-stone-300 mt-auto text-sm">
-        <p className="font-semibold">&copy; {new Date().getFullYear()} Brechó EcoModa - Todos os direitos reservados.</p>
+        <p className="font-semibold">&copy; {new Date().getFullYear()} Intent Brechó - Todos os direitos reservados.</p>
         <p className="text-xs mt-1 text-stone-500">
           Trabalho Individual - Desenvolvimento Web 2 | <Link to="/termos" className="underline hover:text-stone-800">Política de Privacidade & Plágio</Link>
         </p>

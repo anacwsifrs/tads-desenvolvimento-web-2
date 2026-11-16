@@ -1,6 +1,8 @@
 CREATE DATABASE IF NOT EXISTS brecho_db;
 USE brecho_db;
 
+DROP TABLE IF EXISTS pedido_itens;
+DROP TABLE IF EXISTS pedidos;
 DROP TABLE IF EXISTS lote_tag;
 DROP TABLE IF EXISTS tags;
 DROP TABLE IF EXISTS mensagens_contato;
@@ -99,6 +101,9 @@ CREATE TABLE pedido_itens (
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
     FOREIGN KEY (peca_id) REFERENCES pecas(id) ON DELETE RESTRICT
 );
+
+INSERT INTO usuarios (cpf, nome, email, senha, telefone, tipo) VALUES 
+('000.000.000-00', 'Administrador Brechó', 'intent.brecho.contato@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(51) 99999-9999', 'admin');
 
 INSERT INTO categorias (nome) VALUES 
 ('Camisa'), ('Camiseta'), ('Regata'), ('Jaqueta'), 

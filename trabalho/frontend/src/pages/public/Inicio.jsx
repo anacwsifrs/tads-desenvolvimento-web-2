@@ -9,19 +9,19 @@ export default function Inicio() {
     },
     {
       num: '2. Avaliação Inteligente',
-      desc: 'Nossa equipe realiza a triagem presencial e utiliza Inteligência Artificial para avaliar e precificar cada item com justiça.'
+      desc: 'Nossa equipe realiza a triagem e pode utilizar Inteligência Artificial para avaliar e precificar cada item com justiça.'
     },
     {
       num: '3. Proposta & Pagamento',
       desc: (
         <>
-          Você recebe uma proposta no seu painel. Escolha entre receber em <strong>Dinheiro (PIX)</strong> ou em <strong>Crédito (+15% de bônus)</strong> para usar no brechó.
+          Você recebe uma proposta no seu painel. Ela pode ser integral, parcial, ou recusada. Caso aceite, escolha entre receber em <strong>Dinheiro (PIX)</strong> ou em <strong>Crédito (+15% de bônus)</strong> para usar no brechó.
         </>
       )
     },
     {
       num: '4. Vitrine & Reserva',
-      desc: 'As peças aprovadas vão para a Vitrine Pública. Clientes podem adicionar ao carrinho, pagar via PIX e retirar na loja física.'
+      desc: 'As peças aprovadas vão para a Vitrine Pública. Outros clientes podem adicionar ao carrinho, pagar via PIX e retirar na loja física.'
     }
   ];
 
@@ -35,7 +35,7 @@ export default function Inicio() {
           </div>
           
           <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-4">
-            Bem-vindo ao Brechó EcoModa 🌿
+            Bem-vindo ao Intent Brechó
           </h1>
           
           <p className="text-emerald-50 text-base md:text-lg leading-relaxed mb-8">
@@ -67,7 +67,7 @@ export default function Inicio() {
             <span>Como Funciona o Nosso Sistema?</span>
           </h2>
           <p className="text-stone-500 mt-1">
-            Entenda o processo simples e transparente para vender seus lotes e comprar no brechó:
+            Entenda o processo para vender suas roupas usadas e comprar no brechó:
           </p>
         </div>
 
@@ -116,7 +116,7 @@ export default function Inicio() {
           <li className="flex items-start gap-2.5">
             <CheckCircle2 className="text-emerald-600 shrink-0 mt-0.5" size={18} />
             <span>
-              <strong>Doação Consciente (Status 7):</strong> Peças não retiradas dentro do prazo de tolerância ou declaradas para doação são encaminhadas para instituições de caridade parceiras, promovendo a responsabilidade social.
+              <strong>Doação Consciente:</strong> Peças não retiradas dentro do prazo de tolerância ou declaradas para doação são encaminhadas para instituições de caridade parceiras, promovendo a responsabilidade social.
             </span>
           </li>
         </ul>

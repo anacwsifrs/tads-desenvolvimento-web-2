@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Eye, Shirt, Tag } from 'lucide-react';
 
 const API_URL = 'http://localhost/brecho/index.php';
 const UPLOADS_URL = 'http://localhost/brecho/uploads/';
 
 export default function Vitrine() {
+  const navigate = useNavigate();
   const [pecas, setPecas] = useState([]);
   const [carregando, setCarregando] = useState(true);
+  const [adicionandoId, setAdicionandoId] = useState(null);
   const [busca, setBusca] = useState('');
   const [categoriaFiltro, setCategoriaFiltro] = useState('');
 
@@ -26,6 +28,35 @@ export default function Vitrine() {
 
     carregarVitrine();
   }, []);
+
+  const handleAdicionarCarrinho = async (pecaId) => {
+    setAdicionandoId(pecaId);
+    try {
+      const resposta = await fetch(`${API_URL}?acao=adicionar_carrinho&id=${pecaId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      const dados = await resposta.json();
+
+      if (resposta.status === 401) {
+        alert('Faça login para adicionar peças ao carrinho.');
+        navigate('/login');
+        return;
+      }
+
+      if (resposta.ok && dados.sucesso) {
+        navigate('/carrinho');
+      } else {
+        alert(dados.mensagem || 'Não foi possível adicionar a peça ao carrinho.');
+      }
+    } catch (error) {
+      console.error('Erro ao adicionar ao carrinho:', error);
+      alert('Erro de conexão com o servidor.');
+    } finally {
+      setAdicionandoId(null);
+    }
+  };
 
   const categoriasDisponiveis = [...new Set(pecas.map(p => p.categoria_nome))].sort();
   const pecasFiltradas = pecas.filter(p => {
@@ -154,13 +185,15 @@ export default function Vitrine() {
                   <Eye size={16} />
                   <span>Detalhes</span>
                 </Link>
-                <Link
-                  to={`/carrinho?adicionar=${peca.id}`}
-                  className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold transition flex items-center justify-center gap-1.5 shadow-sm"
+                <button
+                  type="button"
+                  disabled={adicionandoId === peca.id}
+                  onClick={() => handleAdicionarCarrinho(peca.id)}
+                  className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-lg text-sm font-bold transition flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   <ShoppingCart size={16} />
-                  <span>Comprar</span>
-                </Link>
+                  <span>{adicionandoId === peca.id ? '...' : 'Comprar'}</span>
+                </button>
               </div>
             </div>
           ))}

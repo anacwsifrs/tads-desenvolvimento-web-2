@@ -22,7 +22,7 @@ export default function Termos() {
             </h3>
             <p className="text-sm md:text-base">
               Em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), o sistema{' '}
-              <strong className="text-stone-800">Brechó EcoModa</strong> garante que os dados cadastrais
+              <strong className="text-stone-800">Intent Brechó</strong> garante que os dados cadastrais
               (CPF, e-mail, telefone e chave PIX) são utilizados exclusivamente para o gerenciamento de
               lotes e pagamentos na plataforma, não sendo compartilhados com terceiros.
             </p>

@@ -52,7 +52,7 @@ export default function Login() {
           </div>
           <h2 className="text-2xl font-black tracking-tight">Login do Usuário</h2>
           <p className="text-stone-400 text-sm mt-1">
-            Acesse sua conta no Brechó EcoModa
+            Acesse sua conta no Intent Brechó
           </p>
         </div>
 

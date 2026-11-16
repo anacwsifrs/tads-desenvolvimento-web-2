@@ -11,6 +11,7 @@ export default function Detalhar() {
 
   const [peca, setPeca] = useState(null);
   const [carregando, setCarregando] = useState(true);
+  const [adicionando, setAdicionando] = useState(false);
   const [erro, setErro] = useState('');
 
   useEffect(() => {
@@ -37,6 +38,36 @@ export default function Detalhar() {
 
     if (id) carregarPeca();
   }, [id]);
+
+  const handleAdicionarCarrinho = async () => {
+    if (!peca) return;
+    setAdicionando(true);
+    try {
+      const resposta = await fetch(`${API_URL}?acao=adicionar_carrinho&id=${peca.id}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      const dados = await resposta.json();
+
+      if (resposta.status === 401) {
+        alert('Faça login para adicionar peças ao carrinho.');
+        navigate('/login');
+        return;
+      }
+
+      if (resposta.ok && dados.sucesso) {
+        navigate('/carrinho');
+      } else {
+        alert(dados.mensagem || 'Não foi possível adicionar a peça ao carrinho.');
+      }
+    } catch (error) {
+      console.error('Erro ao adicionar ao carrinho:', error);
+      alert('Erro de conexão com o servidor.');
+    } finally {
+      setAdicionando(false);
+    }
+  };
 
   const formatarPreco = (valorProposto) => {
     const precoVenda = Number(valorProposto || 0) * 1.4;
@@ -192,12 +223,18 @@ export default function Detalhar() {
 
             <button
               type="button"
-              disabled={indisponivel}
-              onClick={() => navigate(`/carrinho?adicionar=${peca.id}`)}
+              disabled={indisponivel || adicionando}
+              onClick={handleAdicionarCarrinho}
               className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-base transition shadow-md flex items-center justify-center gap-2"
             >
               <ShoppingCart size={20} />
-              <span>{indisponivel ? 'Item Indisponível' : 'Adicionar ao Carrinho'}</span>
+              <span>
+                {indisponivel
+                  ? 'Item Indisponível'
+                  : adicionando
+                  ? 'Adicionando...'
+                  : 'Adicionar ao Carrinho'}
+              </span>
             </button>
 
             <p className="text-xs text-stone-500 text-center">
