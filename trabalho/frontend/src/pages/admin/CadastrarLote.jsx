@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Plus, Trash2, Image as ImageIcon, Search } from 'lucide-react';
 
 const API_URL = 'http://localhost/brecho/index.php'; 
 
-// Classes CSS padrão para reutilizar nos inputs e selects e remover o visual cinza nativo
 const inputClass = "w-full p-2.5 bg-white text-stone-700 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all shadow-sm appearance-none";
 const selectClass = "w-full p-2.5 bg-white text-stone-700 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all shadow-sm";
 
@@ -141,6 +141,7 @@ function ItemLoteColapsavel({ index, peca, atualizarPeca, removerPeca, categoria
 }
 
 export default function CadastrarLote() {
+  const navigate = useNavigate();
   const [fornecedor, setFornecedor] = useState({ cpf: '', nome: '', email: '', telefone: '', pix: '' });
   const [descricaoLote, setDescricaoLote] = useState('');
   const [buscandoCpf, setBuscandoCpf] = useState(false);
@@ -151,7 +152,6 @@ export default function CadastrarLote() {
     { categoria: '', estado: '', marca: '', tamanho: '', cor: '', descricao: '', observacoes: '', foto: null }
   ]);
 
-  // Busca as categorias do banco de dados ao carregar a tela
   useEffect(() => {
     const buscarCategorias = async () => {
       try {
@@ -230,13 +230,18 @@ export default function CadastrarLote() {
     });
 
     try {
-      const resposta = await fetch(`${API_URL}?acao=salvar_lote`, {
+      const resposta = await fetch(`${API_URL}?acao=salvar`, {
         method: 'POST',
+        credentials: 'include',
         body: formData
       });
+      const dados = await resposta.json();
       
-      if(resposta.ok) {
-        alert("Lote cadastrado com sucesso!");
+      if (resposta.ok && dados.sucesso) {
+        alert(dados.mensagem || "Lote cadastrado com sucesso!");
+        navigate('/admin/lotes');
+      } else {
+        alert(dados.mensagem || "Erro ao cadastrar lote.");
       }
     } catch (error) {
       alert("Erro de conexão com o servidor.");

@@ -107,9 +107,6 @@ export default function Layout() {
                         <Link to="/admin/lotes" onClick={() => setMenuAberto(false)} className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-stone-50 hover:text-emerald-600">
                           <ClipboardList size={16} /> Painel Lotes
                         </Link>
-                        <Link to="/admin/cadastrar-lote" onClick={() => setMenuAberto(false)} className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-stone-50 hover:text-emerald-600">
-                          <Package size={16} /> Novo Lote
-                        </Link>
                         <Link to="/admin/pedidos" onClick={() => setMenuAberto(false)} className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-stone-50 hover:text-emerald-600">
                           <ShoppingBag size={16} /> Painel Vendas
                         </Link>

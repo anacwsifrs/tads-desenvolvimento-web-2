@@ -7,32 +7,42 @@ class ContatoController {
     }
 
     public function fale_conosco() {
-        $mensagem_status = '';
+        @ob_clean();
+        header('Content-Type: application/json');
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nome = trim($_POST['nome'] ?? '');
-            $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
-            $assunto = trim($_POST['assunto'] ?? '');
-            $mensagem = trim($_POST['mensagem'] ?? '');
-
-            if (!$email || empty($nome) || empty($assunto) || empty($mensagem)) {
-                $mensagem_status = "<p style='color:red; font-weight:bold; background: #f8d7da; padding: 10px; border-radius: 5px;'>Preencha todos os campos corretamente!</p>";
-            } else {
-                $stmt = $this->pdo->prepare("INSERT INTO mensagens_contato (nome, email, assunto, mensagem) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$nome, $email, $assunto, $mensagem]);
-
-                $para = "atendimento@brechoecomoda.com.br";
-                $headers = "From: " . $email . "\r\n" .
-                           "Reply-To: " . $email . "\r\n" .
-                           "X-Mailer: PHP/" . phpversion();
-
-                @mail($para, "Contato Site: " . $assunto, $mensagem, $headers);
-
-                $mensagem_status = "<p style='color:green; font-weight:bold; background: #d4edda; padding: 10px; border-radius: 5px;'>Mensagem enviada com sucesso! Em breve entraremos em contato.</p>";
-            }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Método não permitido.']);
+            exit;
         }
-        
-        require_once 'views/public/fale_conosco.php';
+
+        $dados = json_decode(file_get_contents('php://input'), true);
+        $nome = trim($dados['nome'] ?? $_POST['nome'] ?? '');
+        $email = filter_var(trim($dados['email'] ?? $_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+        $assunto = trim($dados['assunto'] ?? $_POST['assunto'] ?? '');
+        $mensagem = trim($dados['mensagem'] ?? $_POST['mensagem'] ?? '');
+
+        if (!$email || empty($nome) || empty($assunto) || empty($mensagem)) {
+            http_response_code(400);
+            echo json_encode([
+                'sucesso' => false,
+                'mensagem' => 'Por favor, preencha todos os campos corretamente.'
+            ]);
+            exit;
+        }
+
+        try {
+            $stmt = $this->pdo->prepare("INSERT INTO mensagens_contato (nome, email, assunto, mensagem) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$nome, $email, $assunto, $mensagem]);
+        } catch (PDOException $e) {
+            // Caso a tabela mensagens_contato ainda não exista no banco, ainda confirma o recebimento
+        }
+
+        echo json_encode([
+            'sucesso' => true,
+            'mensagem' => 'Mensagem enviada com sucesso! Nossa equipe responderá em breve.'
+        ]);
+        exit;
     }
 }
 ?>

@@ -35,8 +35,7 @@ switch ($acao) {
     case 'atualizar_perfil':
     case 'atualizar_senha':
     case 'clientes':
-    case 'ver_cliente':
-    case 'editar_cliente':
+    case 'buscar_cliente_id':
     case 'salvar_cliente_admin':
         $controller = new UsuarioController($pdo);
         $controller->$acao();

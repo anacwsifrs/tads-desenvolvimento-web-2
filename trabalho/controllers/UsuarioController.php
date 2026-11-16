@@ -164,49 +164,74 @@ class UsuarioController {
         exit;
     }
 
-    // --- Métodos Admin (serão convertidos para JSON quando migrarmos as telas admin) ---
     public function clientes() {
         $this->verificarAdmin();
+        @ob_clean();
+        header('Content-Type: application/json');
         $clientes = $this->usuarioModel->listarClientes();
-        require_once 'views/admin/clientes.php';
+        foreach ($clientes as &$c) {
+            unset($c['senha']);
+        }
+        echo json_encode($clientes);
+        exit;
     }
 
-    public function ver_cliente() {
+    public function buscar_cliente_id() {
         $this->verificarAdmin();
+        @ob_clean();
+        header('Content-Type: application/json');
         $id = $_GET['id'] ?? 0;
         $cliente = $this->usuarioModel->buscarClientePorId($id);
-        $readonly = true;
-        require_once 'views/admin/form_cliente.php';
-    }
-
-    public function editar_cliente() {
-        $this->verificarAdmin();
-        $id = $_GET['id'] ?? 0;
-        $cliente = $this->usuarioModel->buscarClientePorId($id);
-        $readonly = false;
-        require_once 'views/admin/form_cliente.php';
+        if ($cliente) {
+            unset($cliente['senha']);
+            echo json_encode($cliente);
+        } else {
+            http_response_code(404);
+            echo json_encode(['erro' => 'Cliente não encontrado.']);
+        }
+        exit;
     }
 
     public function salvar_cliente_admin() {
         $this->verificarAdmin();
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'] ?? 0;
-            $nome = $_POST['nome'] ?? '';
-            $telefone = $_POST['telefone'] ?? '';
-            $pix = $_POST['pix'] ?? '';
-            $saldo = $_POST['saldo_credito'] ?? 0;
+        @ob_clean();
+        header('Content-Type: application/json');
 
-            if ($this->usuarioModel->atualizarUsuarioAdmin($id, $nome, $telefone, $pix, $saldo)) {
-                echo "<script>alert('Cliente atualizado com sucesso!'); window.location.href='index.php?acao=clientes';</script>";
-            } else {
-                echo "<script>alert('Erro ao atualizar cliente.'); window.history.back();</script>";
-            }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Método não permitido.']);
+            exit;
         }
+
+        $dados = json_decode(file_get_contents('php://input'), true);
+        $id = $dados['id'] ?? $_POST['id'] ?? 0;
+        $nome = trim($dados['nome'] ?? $_POST['nome'] ?? '');
+        $telefone = trim($dados['telefone'] ?? $_POST['telefone'] ?? '');
+        $pix = trim($dados['chave_pix'] ?? $dados['pix'] ?? $_POST['pix'] ?? '');
+        $saldo = $dados['saldo_credito'] ?? $_POST['saldo_credito'] ?? 0;
+
+        if ($this->usuarioModel->atualizarUsuarioAdmin($id, $nome, $telefone, $pix, $saldo)) {
+            echo json_encode(['sucesso' => true, 'mensagem' => 'Cliente atualizado com sucesso!']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Erro ao atualizar cliente.']);
+        }
+        exit;
     }
 
     private function verificarAdmin() {
-        if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'admin') {
-            header("Location: index.php?acao=meus_lotes");
+        if (!isset($_SESSION['usuario_id'])) {
+            @ob_clean();
+            http_response_code(401);
+            header('Content-Type: application/json');
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Sessão expirada.']);
+            exit;
+        }
+        if ($_SESSION['usuario_tipo'] !== 'admin') {
+            @ob_clean();
+            http_response_code(403);
+            header('Content-Type: application/json');
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Acesso restrito a administradores.']);
             exit;
         }
     }
