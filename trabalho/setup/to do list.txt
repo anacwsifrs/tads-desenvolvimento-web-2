@@ -1,6 +1,5 @@
 Frescura:
 * melhorar as categorias pré-cadastradas em lote
-* botão olhinho pra senha - melhorar ícone
 * melhorar texto da tela de inicio
 * mudar nome brechó ecomoda
 * criar conta admin pra poder mandar as credenciais pro sor
@@ -12,8 +11,7 @@ Frescura:
 * ux mais bonitinha (da pra deixar pro react) com itens de lote colapsaveis pra deixar a visualizção melhor + pré-visualização das peças
 
 Pede na especificação:
-* melhorar/unificar css + usar react em alguma coisa + verificar se o código usa react e se usa as tecnologias em aula, os códigos do sor, etc
-* ver se a cota de tabelas + relacionamentos no bd foi atingida (6-8 tabelas, 2 cadastros simples, 1 cadastro 1 ..n, 2 cadastros n..n). aproveitar para revisar se as tabelas que temos fazem sentido.
+* verificar se o código usa as tecnologias em aula, os códigos do sor, etc
 * Hospedar Locaweb 
 * implementar envio de email
 
